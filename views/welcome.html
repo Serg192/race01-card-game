@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" type="text/css" href="style.css" />
+    <title>t01 logged in</title>
+  </head>
+  <body>
+    <div class="container">
+      <span>Role: </span>
+      <span id="role_txt"></span> <br /><br />
+      <button onclick="onLogout()">Log out</button>
+    </div>
+
+    <script>
+      let req = new XMLHttpRequest();
+      req.open("GET", `/welcome/role`, true);
+      req.setRequestHeader("Content-Type", "application/json");
+      req.addEventListener("load", () => {
+        const resJSON = JSON.parse(req.responseText);
+        document.getElementById("role_txt").innerText = resJSON.role;
+      });
+      req.send();
+
+      function onLogout(ev) {
+        let req = new XMLHttpRequest();
+        req.open("POST", `/welcome/logout`, true);
+        req.setRequestHeader("Content-Type", "application/json");
+        req.addEventListener("load", () => {
+          if (req.status == 200) window.location.href = "/";
+        });
+        req.send();
+      }
+    </script>
+  </body>
+</html>

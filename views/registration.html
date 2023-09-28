@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" type="text/css" href="style.css" />
+    <title>t00 Registration</title>
+  </head>
+  <body>
+    <div class="container">
+      <h2>Registration Form</h2>
+      <form class="registration_form" action="/" method="POST" id="reg_form">
+        <div class="form-group">
+          <input
+            type="text"
+            id="login"
+            name="login"
+            placeholder="Login"
+            required
+          />
+        </div>
+
+        <div class="form-group">
+          <input
+            type="password"
+            id="password"
+            name="password"
+            placeholder="Password"
+            required
+          />
+        </div>
+        <div class="form-group">
+          <input
+            type="password"
+            id="confirm_password"
+            name="confirm_password"
+            placeholder="Confirm Password"
+            required
+          />
+        </div>
+        <div class="form-group">
+          <input
+            type="text"
+            id="full_name"
+            name="full_name"
+            placeholder="Full name"
+            required
+          />
+        </div>
+        <div class="form-group">
+          <input
+            type="text"
+            id="email"
+            name="email"
+            placeholder="Email"
+            required
+          />
+        </div>
+        <div class="error-txt" id="err_txt"></div>
+        <div class="link">
+          <a href="/login">Do you already have an account? Log in</a>
+        </div>
+        <div class="form-group">
+          <input type="submit" class="btn-submit" value="Register" />
+        </div>
+      </form>
+    </div>
+    <script>
+      const errorOutput = document.getElementById("err_txt");
+
+      document.getElementById("reg_form").addEventListener("submit", (e) => {
+        e.preventDefault();
+
+        const login = document.getElementById("login").value;
+        const password = document.getElementById("password").value;
+        const confirmPassword =
+          document.getElementById("confirm_password").value;
+        const fullName = document.getElementById("full_name").value;
+        const email = document.getElementById("email").value;
+
+        let req = new XMLHttpRequest();
+        req.open("POST", `/signup`, true);
+        req.setRequestHeader("Content-Type", "application/json");
+        req.addEventListener("load", () => {
+          if (req.status == 500 || req.status == 422) {
+            const resJSON = JSON.parse(req.responseText);
+            errorOutput.innerText = resJSON.message;
+          } else {
+            window.location.href = "/login";
+          }
+        });
+
+        req.send(
+          JSON.stringify({
+            login: login,
+            password: password,
+            confirmPassword: confirmPassword,
+            fullName: fullName,
+            email: email,
+          })
+        );
+      });
+    </script>
+  </body>
+</html>
