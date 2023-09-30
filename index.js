@@ -22,6 +22,8 @@ app.use("/pass-remind", remindPassword);
 app.use("/welcome", jwtAuthMid);
 app.use("/welcome", welcomeRoute);
 
+app.use(express.static(__dirname + "/public"));
+
 const port = 4545;
 
 app.get("/", (req, res) => {
