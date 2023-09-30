@@ -4,8 +4,9 @@ const app = express();
 
 const loginRoute = require("./route/login-route");
 const regRoute = require("./route/registration-route");
-const welcomeRoute = require("./route/welcome-route");
+// const welcomeRoute = require("./route/welcome-route");
 const remindPassword = require("./route/password-rem-route");
+const lobbyRoute = require("./route/lobby-route");
 
 const jwtAuthMid = require("./middle/jwt-auth-middle");
 
@@ -19,8 +20,10 @@ app.use(cookieParser());
 app.use("/login", loginRoute);
 app.use("/signup", regRoute);
 app.use("/pass-remind", remindPassword);
-app.use("/welcome", jwtAuthMid);
-app.use("/welcome", welcomeRoute);
+// app.use("/welcome", jwtAuthMid);
+// app.use("/welcome", welcomeRoute);
+app.use("/lobby", jwtAuthMid);
+app.use("/lobby", lobbyRoute);
 
 const port = 4545;
 
@@ -30,6 +33,10 @@ app.get("/", (req, res) => {
 
 app.get("/style.css", (req, res) => {
   res.sendFile(__dirname + "/public/style.css");
+});
+
+app.get("/lobby-style.css", (req, res) => {
+  res.sendFile(__dirname + "/public/lobby-style.css");
 });
 
 app.get("*", (req, res) => {

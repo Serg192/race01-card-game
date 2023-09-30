@@ -59,7 +59,7 @@
             const resJSON = JSON.parse(req.responseText);
             errorOutput.innerText = resJSON.message;
           } else {
-            window.location.href = "/welcome";
+            window.location.href = "/lobby"; //previously "/welcome"
           }
         });
 

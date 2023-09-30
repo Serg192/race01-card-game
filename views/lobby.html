@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" type="text/css" href="lobby-style.css" />
+    <title>Lobby</title>
+  </head>
+
+  <body>
+    <form action="/lobby" method="POST">
+        <nav>
+            <ul>
+                <li id="main_section"><a href="#main">Main</a></li>
+                <li id="cards_section"><a href="#cards">Cards</a></li>
+                <li id="rules_section"><a href="#rules">Rules</a></li>
+                <li id="profile_section"><a href="#profile">Profile</a></li>
+                <li id="log_out_section"><a href="#log_out"><button onclick="onLogout()">Log out</button></a></li>
+            </ul>
+        </nav>
+
+        <div class="content">
+            <span id="role_txt"></span>
+            <div id="main" class="main active">
+                <h2>Hi there!</h2>
+            </div>
+            <div id="profile" class="profile">
+                <h2>Profile</h2>
+                <p>This is the profile section.</p>
+            </div>
+            <div id="cards" class="cards">
+                <h2>Cards</h2>
+                <p>This is the cards section.</p>
+            </div>
+            <div id="rules" class="rules">
+                <h2>Rules</h2>
+                <p>This is the rules section.</p>
+            </div>
+        </div>
+    </form>
+
+    <script>
+        let req = new XMLHttpRequest();
+
+        req.open("GET", `/lobby/role`, true);
+        req.setRequestHeader("Content-Type", "application/json");
+        req.addEventListener("load", () => {
+            const resJSON = JSON.parse(req.responseText);
+
+            document.getElementById("role_txt").innerText = resJSON.role;
+        });
+        req.send();
+
+        function onLogout(ev) {
+            let req = new XMLHttpRequest();
+
+            req.open("POST", `/lobby/logout`, true);
+            req.setRequestHeader("Content-Type", "application/json");
+            req.addEventListener("load", () => {
+                if (req.status == 200) window.location.href = "/";
+            });
+            req.send();
+        }
+
+        const menuItems = document.querySelectorAll('nav a');
+        const contentSections = document.querySelectorAll('.content > div');
+
+        menuItems.forEach((menuItem) => {
+            menuItem.addEventListener('click', (e) => {
+                e.preventDefault();
+
+                const targetId = e.target.getAttribute('href').substring(1);
+
+                contentSections.forEach((section) => {
+                    section.classList.remove('active');
+                });
+
+                document.getElementById(targetId).classList.add('active');
+            });
+        });
+    </script>
+  </body>
+</html>

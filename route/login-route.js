@@ -23,7 +23,7 @@ router.post("/", async (req, res) => {
       .user_role;
     const jwtToken = generateUserJWT(req.body.login, userRole);
     res.cookie("token", jwtToken, { httpOnly: true });
-    res.redirect("/welcome");
+    res.redirect("/lobby"); //previously "/welcome"
   } else {
     res.status(401).json({
       message: validationResult.message,
