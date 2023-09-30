@@ -11,7 +11,6 @@ CREATE TABLE IF NOT EXISTS users (
     user_full_name VARCHAR(50) NOT NULL,
     user_email VARCHAR(35) UNIQUE NOT NULL,
     user_role ENUM('admin', 'user') DEFAULT 'user',
-    user_health INT UNSIGNED DEFAULT 20,
     PRIMARY KEY(id)
 );
 
@@ -33,6 +32,7 @@ CREATE TABLE IF NOT EXISTS cards (
     card_defence INT UNSIGNED NOT NULL,
     card_usage_price INT UNSIGNED NOT NULL,
     card_price INT UNSIGNED NOT NULL,
+    card_health INT UNSIGNED DEFAULT 50,
     card_picture VARCHAR(30) UNIQUE NOT NULL,
     PRIMARY KEY (id)
 );
