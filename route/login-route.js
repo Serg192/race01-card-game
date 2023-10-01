@@ -22,7 +22,7 @@ router.post("/", async (req, res) => {
     const userId = (await new User().findByLogin(req.body.login))[0].id;
     const jwtToken = generateUserJWT(req.body.login, userId);
     res.cookie("token", jwtToken, { httpOnly: true });
-    res.redirect("/welcome");
+    res.redirect("/lobby"); //previously "/welcome"
   } else {
     res.status(401).json({
       message: validationResult.message,
