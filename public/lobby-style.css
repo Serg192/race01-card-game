@@ -12,7 +12,9 @@ nav {
 }
 
 nav ul {
-    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 nav li {
@@ -30,7 +32,7 @@ nav a {
     padding: 20px;
 }
 
-.main, .profile, .cards, .rules, #role_txt {
+.main, .profile, .cards, .rules {
     display: none;
 }
 
@@ -58,4 +60,10 @@ button {
 button:hover {
     background-color: white;
     color: red;
+}
+
+#profile_picture {
+    height: 50px;
+    width: 50px;
+    border-radius: 50%;
 }
