@@ -1,4 +1,8 @@
 const Model = require("../model.js");
+const AccountDetails = require("./account-details");
+const Cards = require("../models/cards.js");
+const UserCards = require("../models/user-cards.js");
+const props = require("../properties.js");
 
 class User extends Model {
   constructor({
@@ -25,18 +29,35 @@ class User extends Model {
   }
 
   async save() {
-    return await super.save({
+    let userData = {
       id: this.id,
       user_login: this.userLogin,
       user_password: this.userPassword,
       user_full_name: this.userFullName,
       user_email: this.userEmail,
-    });
-  }
+    };
 
-  //function to map table row to user object
-  mapFields(row) {
-    
+    let result = null;
+    if (this.id == null) {
+      result = await super.create(userData);
+      if (result != null) {
+        new AccountDetails().createEntryFor(result[0].insertId);
+        const cards = new Cards();
+        const uCards = new UserCards();
+        (await cards.getRandom(props.DEFAULT_CARD_NUMBER))[0].forEach(
+          (card) => {
+            uCards.create({
+              user_id: result[0].insertId,
+              card_id: card.id,
+            });
+          }
+        );
+      }
+    } else {
+      return (await super.update([userData, this.id])) != null;
+    }
+
+    return result != null;
   }
 }
 

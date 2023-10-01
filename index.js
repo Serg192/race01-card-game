@@ -6,6 +6,7 @@ const loginRoute = require("./route/login-route");
 const regRoute = require("./route/registration-route");
 const welcomeRoute = require("./route/welcome-route");
 const remindPassword = require("./route/password-rem-route");
+const gameApiRoute = require("./route/game-api-route");
 
 const jwtAuthMid = require("./middle/jwt-auth-middle");
 
@@ -21,6 +22,8 @@ app.use("/signup", regRoute);
 app.use("/pass-remind", remindPassword);
 app.use("/welcome", jwtAuthMid);
 app.use("/welcome", welcomeRoute);
+app.use("/game-api", jwtAuthMid);
+app.use("/game-api", gameApiRoute);
 
 const port = 4545;
 

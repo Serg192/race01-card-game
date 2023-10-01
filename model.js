@@ -5,19 +5,6 @@ class Model {
     this.tableName = tableName;
   }
 
-  async findById(id) {
-    const connection = await pool.getConnection();
-    try {
-      const [rows] = await connection.query(
-        `SELECT * FROM ${this.tableName} WHERE id = ?`,
-        [id]
-      );
-      return rows[0];
-    } finally {
-      connection.release();
-    }
-  }
-
   async findBy(key, value) {
     const connection = await pool.getConnection();
     try {
@@ -31,13 +18,14 @@ class Model {
     }
   }
 
-  async delete(id) {
+  async delete(id, idname = "id") {
     if (await this.find(id)) {
       const connection = await pool.getConnection();
       try {
-        await connection.query(`DELETE FROM ${this.tableName} WHERE id = ?`, [
-          id,
-        ]);
+        await connection.query(
+          `DELETE FROM ${this.tableName} WHERE ${idname} = ?`,
+          [id]
+        );
         return true;
       } catch (e) {
         return false;
@@ -48,25 +36,41 @@ class Model {
     return false;
   }
 
-  async save(data) {
-    let operationSuccess = true;
-
+  async create(data) {
+    let opResult = null;
     const connection = await pool.getConnection();
     try {
-      if (data.id) {
-        await connection.query(`UPDATE ${this.tableName} SET ? WHERE id = ?`, [
-          data,
-          data.id,
-        ]);
-      } else {
-        await connection.query(`INSERT INTO ${this.tableName} SET ?`, data);
-      }
+      opResult = await connection.query(
+        `INSERT INTO ${this.tableName} SET ?`,
+        data
+      );
     } catch (err) {
-      operationSuccess = false;
+      console.error(err);
     } finally {
       connection.release();
     }
-    return operationSuccess;
+
+    return opResult;
+  }
+
+  async update(data, idname = "id") {
+    return await super.execute(
+      `UPDATE ${this.tableName} SET ? WHERE ${idname} = ?`,
+      data
+    );
+  }
+
+  async execute(query, params = []) {
+    let opResult = null;
+    const connection = await pool.getConnection();
+    try {
+      opResult = await connection.query(query, params);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      connection.release();
+    }
+    return opResult;
   }
 }
 

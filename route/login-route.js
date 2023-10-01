@@ -7,10 +7,10 @@ const { validateLoginData } = require("../validation");
 const User = require("../models/user");
 const props = require("../properties");
 
-function generateUserJWT(login, role) {
+function generateUserJWT(login, id) {
   const payload = {
     login,
-    role,
+    id,
   };
 
   return jwt.sign(payload, props.SECRET, { expiresIn: "1h" });
@@ -19,9 +19,8 @@ function generateUserJWT(login, role) {
 router.post("/", async (req, res) => {
   const validationResult = await validateLoginData(req.body);
   if (validationResult.valid) {
-    const userRole = (await new User().findByLogin(req.body.login))[0]
-      .user_role;
-    const jwtToken = generateUserJWT(req.body.login, userRole);
+    const userId = (await new User().findByLogin(req.body.login))[0].id;
+    const jwtToken = generateUserJWT(req.body.login, userId);
     res.cookie("token", jwtToken, { httpOnly: true });
     res.redirect("/welcome");
   } else {
