@@ -37,8 +37,9 @@
             <div id="profile" class="profile">
                 <h2>Profile</h2>
                 <p>This is the profile section.</p>
-                <!-- <li id="log_out_section"><a href="#log_out"><button onclick="onLogout()">Log out</button></a></li> -->
-                <button onclick="onLogout()">Log out</button>
+                <a href="#log_out">
+                    <button onclick="onLogout(event)">Log out</button>
+                </a>
             </div>
         </div>
     </form>
@@ -56,6 +57,20 @@
 
         loginReq.send();
 
+
+        function onLogout(ev) {
+            ev.preventDefault();
+
+            let req = new XMLHttpRequest();
+
+            req.open("POST", `/lobby/logout`, true);
+            req.setRequestHeader("Content-Type", "application/json");
+            req.addEventListener("load", () => {
+                if (req.status == 200) window.location.href = "/";
+            });
+            req.send();
+        }
+
         
         let profilePictureReq = new XMLHttpRequest();
 
@@ -71,20 +86,8 @@
         });
 
         profilePictureReq.send();
-
-
-        function onLogout(ev) {
-            let req = new XMLHttpRequest();
-
-            req.open("POST", `/lobby/logout`, true);
-            req.setRequestHeader("Content-Type", "application/json");
-            req.addEventListener("load", () => {
-                if (req.status == 200) window.location.href = "/";
-            });
-            req.send();
-        }
-
         
+
         const menuItems = document.querySelectorAll('nav a');
         const contentSections = document.querySelectorAll('.content > div');
 
