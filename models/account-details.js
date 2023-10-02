@@ -7,6 +7,24 @@ class AccountDetails extends Model {
     super("account_details");
   }
 
+  async getFullAccountInfo(userID) {
+    return await super.execute(`
+      SELECT
+        users.id,
+        users.user_login,
+        users.user_email,
+        account_details.user_picture,
+        account_details.user_coins,
+        account_details.user_wins,
+        account_details.user_losses
+      FROM
+        users
+      JOIN
+        account_details ON users.id = account_details.user_id
+      WHERE
+        users.id = ${userID}`);
+  }
+
   async createEntryFor(id) {
     return await super.create({
       user_id: id,

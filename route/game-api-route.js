@@ -9,11 +9,11 @@ const Cards = require("../models/cards");
 
 const { validateCardPurchase } = require("../validation");
 
-router.get("/player-stats", async (req, res) => {
+router.get("/account-info", async (req, res) => {
   const userID = jwt.decode(req.cookies.token).id;
   res
     .status(200)
-    .json((await new AccountDetails().findBy("user_id", userID))[0]);
+    .json((await new AccountDetails().getFullAccountInfo(userID))[0]);
 });
 
 router.get("/store-items", async (req, res) => {
