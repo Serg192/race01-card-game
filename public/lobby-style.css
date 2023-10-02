@@ -9,6 +9,7 @@ body, ul {
 body {
     background-image: url('/assets/lobby-background.jpg');
     background-size: cover;
+    background-repeat: no-repeat;
 }
 
 nav {
@@ -51,7 +52,11 @@ nav a {
     padding: 10px 20px;
 }
 
-#main_login_txt, #profile_login_txt, #full_name_txt, #email_txt {
+#main_login_txt, #profile_login_txt,
+#email_txt,
+#coins_number_txt,
+#wins_number_txt,
+#losses_number_txt {
     font-weight: bold;
 }
 

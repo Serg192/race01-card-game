@@ -37,8 +37,10 @@
             <div id="profile" class="profile">
                 <h2>Profile</h2>
                 <p>Your login: <span id="profile_login_txt"></span></p>
-                <p>Your full name: <span id="full_name_txt"></span></p>
                 <p>Your email: <span id="email_txt"></span></p>
+                <p>Number of your coins: <span id="coins_number_txt"></span></p>
+                <p>You won <span id="wins_number_txt"></span> time(s)!</p>
+                <p>You lost <span id="losses_number_txt"></span> time(s)!</p>
                 <a href="#log_out">
                     <button onclick="onLogout(event)">Log out</button>
                 </a>
@@ -47,21 +49,6 @@
     </form>
 
     <script>
-        let loginReq = new XMLHttpRequest();
-
-        loginReq.open("GET", `/lobby/login`, true);
-        loginReq.setRequestHeader("Content-Type", "application/json");
-        loginReq.addEventListener("load", () => {
-            const resJSON = JSON.parse(loginReq.responseText);
-            const login = resJSON.login;
-
-            document.getElementById("main_login_txt").innerText = login;
-            document.getElementById("profile_login_txt").innerText = login;
-        });
-
-        loginReq.send();
-
-
         function onLogout(ev) {
             ev.preventDefault();
 
@@ -75,36 +62,32 @@
             req.send();
         }
 
-        
-        let profilePictureReq = new XMLHttpRequest();
-
-        profilePictureReq.open("GET", `/lobby/profile_picture`, true);
-        profilePictureReq.setRequestHeader("Content-Type", "application/json");
-        profilePictureReq.addEventListener("load", () => {
-            if (profilePictureReq.status === 200) {
-                const resJSON = JSON.parse(profilePictureReq.responseText);
-                const profilePicture = resJSON.profile_picture;
-                const profilePictureElement = document.getElementById("profile_picture");
-                profilePictureElement.src = `/assets/profile-image/${profilePicture}`;
-            }
-        });
-
-        profilePictureReq.send();
-
 
         let userDetailsReq = new XMLHttpRequest();
 
-        userDetailsReq.open("GET", `/lobby/user_details`, true);
+        userDetailsReq.open("GET", `/game-api/account-info`, true);
         userDetailsReq.setRequestHeader("Content-Type", "application/json");
         userDetailsReq.addEventListener("load", () => {
-        if (userDetailsReq.status === 200) {
-            const resJSON = JSON.parse(userDetailsReq.responseText);
-            const fullName = resJSON.full_name;
-            const email = resJSON.email;
-            
-            document.getElementById("full_name_txt").innerText = fullName;
-            document.getElementById("email_txt").innerText = email;
-        }
+            if (userDetailsReq.status === 200) {
+                const resJSON = JSON.parse(userDetailsReq.responseText);
+
+                const profilePicture = resJSON[0].user_picture;
+                const profilePictureElement = document.getElementById("profile_picture");
+                profilePictureElement.src = `/assets/profile-image/${profilePicture}`;
+
+                const login = resJSON[0].user_login;
+                const email = resJSON[0].user_email;
+                const coins = resJSON[0].user_coins;
+                const wins = resJSON[0].user_wins;
+                const losses = resJSON[0].user_losses;
+
+                document.getElementById("main_login_txt").innerText = login;
+                document.getElementById("profile_login_txt").innerText = login;
+                document.getElementById("email_txt").innerText = email;
+                document.getElementById("coins_number_txt").innerText = coins;
+                document.getElementById("wins_number_txt").innerText = wins;
+                document.getElementById("losses_number_txt").innerText = losses;
+            }
         });
 
         userDetailsReq.send();
