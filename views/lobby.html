@@ -9,106 +9,129 @@
 
   <body>
     <form action="/lobby" method="POST">
-        <nav>
-            <ul>
-                <li id="main_section"><a href="#main">Main</a></li>
-                <li id="cards_section"><a href="#cards">Cards</a></li>
-                <li id="rules_section"><a href="#rules">Rules</a></li>
-                <li id="profile_section">
-                    <a href="#profile">
-                        <img id="profile_picture" src="" alt="Profile Picture" />
-                    </a>
-                </li>
-            </ul>
-        </nav>
+      <nav>
+        <ul>
+          <li id="main_section"><a href="#main">Main</a></li>
+          <li id="cards_section"><a href="#cards">Cards</a></li>
+          <li id="rules_section"><a href="#rules">Rules</a></li>
+          <li id="profile_section">
+            <a href="#profile">
+              <img id="profile_picture" src="" alt="Profile Picture" />
+            </a>
+          </li>
+        </ul>
+      </nav>
 
-        <div class="content">
-            <div id="main" class="main active">
-                <h2>Hi there, <span id="main_login_txt"></span>!</h2>
-            </div>
-            <div id="cards" class="cards">
-                <h2>Cards</h2>
-                <p>This is the cards section.</p>
-            </div>
-            <div id="rules" class="rules">
-                <h2>Rules</h2>
-                <p>This is the rules section.</p>
-            </div>
-            <div id="profile" class="profile">
-                <h2>Profile</h2>
-                <p>Your login: <span id="profile_login_txt"></span></p>
-                <p>Your email: <span id="email_txt"></span></p>
-                <p>Number of your coins: <span id="coins_number_txt"></span></p>
-                <p>You won <span id="wins_number_txt"></span> time(s)!</p>
-                <p>You lost <span id="losses_number_txt"></span> time(s)!</p>
-                <a href="#log_out">
-                    <button onclick="onLogout(event)">Log out</button>
-                </a>
-            </div>
+      <div class="content">
+        <div id="main" class="main active">
+          <h2>Hi there, <span id="main_login_txt"></span>!</h2>
         </div>
+        <div id="cards" class="cards">
+          <h2>Cards</h2>
+          <p>This is the cards section.</p>
+        </div>
+        <div id="rules" class="rules">
+          <h2>Rules</h2>
+          <p>This is the rules section.</p>
+        </div>
+        <div id="profile" class="profile">
+          <h2>Profile</h2>
+          <p>Your login: <span id="profile_login_txt"></span></p>
+          <p>Your email: <span id="email_txt"></span></p>
+          <p>Number of your coins: <span id="coins_number_txt"></span></p>
+          <p>You won <span id="wins_number_txt"></span> time(s)!</p>
+          <p>You lost <span id="losses_number_txt"></span> time(s)!</p>
+          <a href="#log_out">
+            <button onclick="onLogout(event)">Log out</button>
+          </a>
+        </div>
+      </div>
     </form>
-
+    <button onclick="onPlay()">PLAY</button>
+    <script src="/socket.io/socket.io.js"></script>
     <script>
-        function onLogout(ev) {
-            ev.preventDefault();
+      function onLogout(ev) {
+        ev.preventDefault();
 
-            let req = new XMLHttpRequest();
+        let req = new XMLHttpRequest();
 
-            req.open("POST", `/lobby/logout`, true);
-            req.setRequestHeader("Content-Type", "application/json");
-            req.addEventListener("load", () => {
-                if (req.status == 200) window.location.href = "/";
-            });
-            req.send();
+        req.open("POST", `/lobby/logout`, true);
+        req.setRequestHeader("Content-Type", "application/json");
+        req.addEventListener("load", () => {
+          if (req.status == 200) window.location.href = "/";
+        });
+        req.send();
+      }
+
+      let login;
+      let userDetailsReq = new XMLHttpRequest();
+
+      userDetailsReq.open("GET", `/game-api/account-info`, true);
+      userDetailsReq.setRequestHeader("Content-Type", "application/json");
+      userDetailsReq.addEventListener("load", () => {
+        if (userDetailsReq.status === 200) {
+          const resJSON = JSON.parse(userDetailsReq.responseText);
+
+          const profilePicture = resJSON[0].user_picture;
+          const profilePictureElement =
+            document.getElementById("profile_picture");
+          profilePictureElement.src = `/assets/profile-image/${profilePicture}`;
+
+          login = resJSON[0].user_login;
+          const email = resJSON[0].user_email;
+          const coins = resJSON[0].user_coins;
+          const wins = resJSON[0].user_wins;
+          const losses = resJSON[0].user_losses;
+
+          document.getElementById("main_login_txt").innerText = login;
+          document.getElementById("profile_login_txt").innerText = login;
+          document.getElementById("email_txt").innerText = email;
+          document.getElementById("coins_number_txt").innerText = coins;
+          document.getElementById("wins_number_txt").innerText = wins;
+          document.getElementById("losses_number_txt").innerText = losses;
         }
+      });
 
+      userDetailsReq.send();
 
-        let userDetailsReq = new XMLHttpRequest();
+      const menuItems = document.querySelectorAll("nav a");
+      const contentSections = document.querySelectorAll(".content > div");
 
-        userDetailsReq.open("GET", `/game-api/account-info`, true);
-        userDetailsReq.setRequestHeader("Content-Type", "application/json");
-        userDetailsReq.addEventListener("load", () => {
-            if (userDetailsReq.status === 200) {
-                const resJSON = JSON.parse(userDetailsReq.responseText);
+      menuItems.forEach((menuItem) => {
+        menuItem.addEventListener("click", (e) => {
+          e.preventDefault();
 
-                const profilePicture = resJSON[0].user_picture;
-                const profilePictureElement = document.getElementById("profile_picture");
-                profilePictureElement.src = `/assets/profile-image/${profilePicture}`;
+          const targetId = e.currentTarget.getAttribute("href").substring(1);
 
-                const login = resJSON[0].user_login;
-                const email = resJSON[0].user_email;
-                const coins = resJSON[0].user_coins;
-                const wins = resJSON[0].user_wins;
-                const losses = resJSON[0].user_losses;
+          contentSections.forEach((section) => {
+            section.classList.remove("active");
+          });
 
-                document.getElementById("main_login_txt").innerText = login;
-                document.getElementById("profile_login_txt").innerText = login;
-                document.getElementById("email_txt").innerText = email;
-                document.getElementById("coins_number_txt").innerText = coins;
-                document.getElementById("wins_number_txt").innerText = wins;
-                document.getElementById("losses_number_txt").innerText = losses;
-            }
+          document.getElementById(targetId).classList.add("active");
         });
+      });
 
-        userDetailsReq.send();
+      //**********************************************************************
+      //soket io stuff
+      let socket = io();
+      let activeSearch = false;
 
+      socket.on("connect_error", function (err) {
+        //handle error
+        console.log(err);
+      });
 
-        const menuItems = document.querySelectorAll('nav a');
-        const contentSections = document.querySelectorAll('.content > div');
+      socket.on("room-found", (data) => {
+        console.log(
+          `Game start: first move-> ${data.first}, opponent-> ${data.second}`
+        );
+      });
 
-        menuItems.forEach((menuItem) => {
-            menuItem.addEventListener('click', (e) => {
-                e.preventDefault();
-
-                const targetId = e.currentTarget.getAttribute('href').substring(1);
-
-                contentSections.forEach((section) => {
-                    section.classList.remove('active');
-                });
-
-                document.getElementById(targetId).classList.add('active');
-            });
-        });
+      function onPlay(e) {
+        if (!activeSearch) socket.emit("search-room", { login: login });
+        else socket.emit("stop-search-room", { login: login });
+        activeSearch = !activeSearch;
+      }
     </script>
   </body>
 </html>
