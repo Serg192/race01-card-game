@@ -13,7 +13,6 @@
             <ul>
                 <li id="main_section"><a href="#main">Main</a></li>
                 <li id="cards_section"><a href="#cards">Cards</a></li>
-                <li id="store_section"><a href="#store">Store</a></li>
                 <li id="rules_section"><a href="#rules">Rules</a></li>
                 <li id="profile_section">
                     <a href="#profile">
@@ -27,23 +26,9 @@
             <div id="main" class="main active">
                 <h2>Hi there, <span id="main_login_txt"></span>!</h2>
             </div>
-            <template id="card-template">
-                <div id="cards" class="cards">
-                    <img id="card_picture" src="" alt="Card Picture">
-                    <h3><span id="card_name_txt"></span></h3>
-                    <p>Class: <span id="card_class_txt"></span></p>
-                    <p>
-                        Attack: <span id="card_attack_txt"></span><br />
-                        Defense: <span id="card_defence_txt"></span><br />
-                        Health: <span id="card_health_txt"></span><br />
-                    </p>
-                    <p>Usage price: <span id="card_usage_price_txt"></span></p>
-                    <p>Price: <span id="card_price_txt"></span></p>
-                </div>
-            </template>              
-            <div id="store" class="store">
-                <h2>Store</h2>
-                <p>This is the store section.</p>
+            <div id="cards" class="cards">
+                <h2>Cards</h2>
+                <p>This is the cards section.</p>
             </div>
             <div id="rules" class="rules">
                 <h2>Rules</h2>
@@ -62,146 +47,92 @@
             </div>
         </div>
     </form>
-
+    <button onclick="onPlay()">PLAY</button>
+    <script src="/socket.io/socket.io.js"></script>
     <script>
-        function onLogout(ev) {
-            ev.preventDefault();
+      function onLogout(ev) {
+        ev.preventDefault();
 
-            let req = new XMLHttpRequest();
+        let req = new XMLHttpRequest();
 
-            req.open("POST", `/lobby/logout`, true);
-            req.setRequestHeader("Content-Type", "application/json");
-            req.addEventListener("load", () => {
-                if (req.status == 200) window.location.href = "/";
-            });
-            req.send();
+        req.open("POST", `/lobby/logout`, true);
+        req.setRequestHeader("Content-Type", "application/json");
+        req.addEventListener("load", () => {
+          if (req.status == 200) window.location.href = "/";
+        });
+        req.send();
+      }
+
+      let login;
+      let userDetailsReq = new XMLHttpRequest();
+
+      userDetailsReq.open("GET", `/game-api/account-info`, true);
+      userDetailsReq.setRequestHeader("Content-Type", "application/json");
+      userDetailsReq.addEventListener("load", () => {
+        if (userDetailsReq.status === 200) {
+          const resJSON = JSON.parse(userDetailsReq.responseText);
+
+          const profilePicture = resJSON[0].user_picture;
+          const profilePictureElement =
+            document.getElementById("profile_picture");
+          profilePictureElement.src = `/assets/profile-image/${profilePicture}`;
+
+          login = resJSON[0].user_login;
+          const email = resJSON[0].user_email;
+          const coins = resJSON[0].user_coins;
+          const wins = resJSON[0].user_wins;
+          const losses = resJSON[0].user_losses;
+
+          document.getElementById("main_login_txt").innerText = login;
+          document.getElementById("profile_login_txt").innerText = login;
+          document.getElementById("email_txt").innerText = email;
+          document.getElementById("coins_number_txt").innerText = coins;
+          document.getElementById("wins_number_txt").innerText = wins;
+          document.getElementById("losses_number_txt").innerText = losses;
         }
+      });
 
-
-        let userDetailsReq = new XMLHttpRequest();
-
-        userDetailsReq.open("GET", `/game-api/account-info`, true);
-        userDetailsReq.setRequestHeader("Content-Type", "application/json");
-        userDetailsReq.addEventListener("load", () => {
-            if (userDetailsReq.status === 200) {
-                const resJSON = JSON.parse(userDetailsReq.responseText);
-
-                const profilePicture = resJSON[0].user_picture;
-                const profilePictureElement = document.getElementById("profile_picture");
-                profilePictureElement.src = `/assets/profile-image/${profilePicture}`;
-
-                const login = resJSON[0].user_login;
-                const email = resJSON[0].user_email;
-                const coins = resJSON[0].user_coins;
-                const wins = resJSON[0].user_wins;
-                const losses = resJSON[0].user_losses;
-
-                document.getElementById("main_login_txt").innerText = login;
-                document.getElementById("profile_login_txt").innerText = login;
-                document.getElementById("email_txt").innerText = email;
-                document.getElementById("coins_number_txt").innerText = coins;
-                document.getElementById("wins_number_txt").innerText = wins;
-                document.getElementById("losses_number_txt").innerText = losses;
-            }
-        });
-
-        userDetailsReq.send();
-
-
-        let randPlayerCardReq = new XMLHttpRequest();
-
-        randPlayerCardReq.open("GET", `/game-api/player-rand-card`, true);
-        randPlayerCardReq.setRequestHeader("Content-Type", "application/json");
-        randPlayerCardReq.addEventListener("load", () => {
-            if (randPlayerCardReq.status === 200) {
-                const resJSON = JSON.parse(randPlayerCardReq.responseText);
-
-                const cardTemplate = document.querySelector('#card-template');
-                const cardClone = document.importNode(cardTemplate.content, true);
-
-                const cardPictureElement = cardClone.querySelector('#card_picture');
-                const cardNameElement = cardClone.querySelector('#card_name_txt');
-                const cardClassElement = cardClone.querySelector('#card_class_txt');
-                const cardAttackElement = cardClone.querySelector('#card_attack_txt');
-                const cardDefenceElement = cardClone.querySelector('#card_defence_txt');
-                const cardHealthElement = cardClone.querySelector('#card_health_txt');
-                const cardUsagePriceElement = cardClone.querySelector('#card_usage_price_txt');
-                const cardPriceElement = cardClone.querySelector('#card_price_txt');
-
-                const cardPicture = resJSON[0].card_picture;
-                cardPictureElement.src = `/assets/characters/${cardPicture}`;
-                cardNameElement.textContent = resJSON[0].card_name;
-                cardClassElement.textContent = resJSON[0].card_class;
-                cardAttackElement.textContent = resJSON[0].card_attack;
-                cardDefenceElement.textContent = resJSON[0].card_defence;
-                cardHealthElement.textContent = resJSON[0].card_health;
-                cardUsagePriceElement.textContent = resJSON[0].card_usage_price;
-                cardPriceElement.textContent = resJSON[0].card_price;
-
-                const cardContainer = document.querySelector('.content');
-                cardContainer.appendChild(cardClone);
-            }
-        });
-
-        randPlayerCardReq.send();
-
-
-        // let playerCardsReq = new XMLHttpRequest();
-
-        // playerCardsReq.open("GET", `/game-api/player-cards`, true);
-        // playerCardsReq.setRequestHeader("Content-Type", "application/json");
-        // playerCardsReq.addEventListener("load", () => {
-        //     if (playerCardsReq.status === 200) {
-        //         const resJSON = JSON.parse(playerCardsReq.responseText);
-        //         const cardContainer = document.querySelector('.content');
-                
-        //         resJSON.forEach(cardData => {
-        //             const cardTemplate = document.querySelector('#card-template');
-        //             const cardClone = document.importNode(cardTemplate.content, true);
-
-        //             const cardPictureElement = cardClone.querySelector('#card_picture');
-        //             const cardNameElement = cardClone.querySelector('#card_name_txt');
-        //             const cardClassElement = cardClone.querySelector('#card_class_txt');
-        //             const cardAttackElement = cardClone.querySelector('#card_attack_txt');
-        //             const cardDefenceElement = cardClone.querySelector('#card_defence_txt');
-        //             const cardHealthElement = cardClone.querySelector('#card_health_txt');
-        //             const cardUsagePriceElement = cardClone.querySelector('#card_usage_price_txt');
-        //             const cardPriceElement = cardClone.querySelector('#card_price_txt');
-
-        //             const cardPicture = cardData.card_picture;
-        //             cardPictureElement.src = `/assets/characters/${cardPicture}`;
-        //             cardNameElement.textContent = cardData.card_name;
-        //             cardClassElement.textContent = cardData.card_class;
-        //             cardAttackElement.textContent = cardData.card_attack;
-        //             cardDefenceElement.textContent = cardData.card_defence;
-        //             cardHealthElement.textContent = cardData.card_health;
-        //             cardUsagePriceElement.textContent = cardData.card_usage_price;
-        //             cardPriceElement.textContent = cardData.card_price;
-
-        //             cardContainer.appendChild(cardClone);
-        //         });
-        //     }
-        // });
-
-        // playerCardsReq.send();
+      userDetailsReq.send();
 
 
         const menuItems = document.querySelectorAll('nav a');
         const contentSections = document.querySelectorAll('.content > div');
 
-        menuItems.forEach((menuItem) => {
-            menuItem.addEventListener('click', (e) => {
-                e.preventDefault();
+      menuItems.forEach((menuItem) => {
+        menuItem.addEventListener("click", (e) => {
+          e.preventDefault();
 
-                const targetId = e.currentTarget.getAttribute('href').substring(1);
+          const targetId = e.currentTarget.getAttribute("href").substring(1);
 
-                contentSections.forEach((section) => {
-                    section.classList.remove('active');
-                });
+          contentSections.forEach((section) => {
+            section.classList.remove("active");
+          });
 
-                document.getElementById(targetId).classList.add('active');
-            });
+          document.getElementById(targetId).classList.add("active");
         });
+      });
+
+      //**********************************************************************
+      //soket io stuff
+      let socket = io();
+      let activeSearch = false;
+
+      socket.on("connect_error", function (err) {
+        //handle error
+        console.log(err);
+      });
+
+      socket.on("room-found", (data) => {
+        console.log(
+          `Game start: first move-> ${data.first}, opponent-> ${data.second}`
+        );
+      });
+
+      function onPlay(e) {
+        if (!activeSearch) socket.emit("search-room", { login: login });
+        else socket.emit("stop-search-room", { login: login });
+        activeSearch = !activeSearch;
+      }
     </script>
   </body>
 </html>

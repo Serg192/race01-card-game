@@ -9,6 +9,8 @@ const Cards = require("../models/cards");
 
 const { validateCardPurchase } = require("../validation");
 
+const props = require("../properties");
+
 router.get("/account-info", async (req, res) => {
   const userID = jwt.decode(req.cookies.token).id;
   res
@@ -51,6 +53,17 @@ router.post("/buy-card", async (req, res) => {
     });
 
     res.status(200).json({});
+  }
+});
+
+router.get("/card", async (req, res) => {
+  const cardID = req.query.id;
+  if (cardID < 0 || cardID > props.CARD_COUNT) {
+    res
+      .status(400)
+      .json({ message: `Id is out of range 0 <= id <= ${props.CARD_COUNT}` });
+  } else {
+    res.status(200).json((await new Cards().findBy("id", cardID))[0]);
   }
 });
 

@@ -4,12 +4,18 @@ const app = express();
 
 const loginRoute = require("./route/login-route");
 const regRoute = require("./route/registration-route");
-// const welcomeRoute = require("./route/welcome-route");
 const remindPassword = require("./route/password-rem-route");
 const gameApiRoute = require("./route/game-api-route");
 const lobbyRoute = require("./route/lobby-route");
 
 const jwtAuthMid = require("./middle/jwt-auth-middle");
+
+const { initSocket } = require("./socket");
+
+const http = require("http");
+const server = http.createServer(app);
+
+initSocket(server);
 
 app.use(express.json());
 app.use(
@@ -35,18 +41,10 @@ app.get("/", (req, res) => {
   res.redirect("/login");
 });
 
-app.get("/style.css", (req, res) => {
-  res.sendFile(__dirname + "/public/style.css");
-});
-
-app.get("/lobby-style.css", (req, res) => {
-  res.sendFile(__dirname + "/public/lobby-style.css");
-});
-
 app.get("*", (req, res) => {
   res.sendFile(__dirname + "/views/not-found.html");
 });
 
-app.listen(port, () => {
+server.listen(port, () => {
   console.log(`Server started on port: ${port}`);
 });
