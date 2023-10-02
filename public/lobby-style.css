@@ -2,17 +2,29 @@ body, ul {
     margin: 0;
     padding: 0;
     font-family: Arial, sans-serif;
+    color: white;
     list-style: none;
 }
 
+body {
+    background-image: url('/assets/lobby-background.jpg');
+    background-size: cover;
+    background-repeat: no-repeat;
+}
+
 nav {
-    background-color: #36393f;
-    text-align: center;
+    background-color: #ec1d24;
+    margin: 20px;
     padding: 20px;
+    border-radius: 20px;
+    text-align: center;
+    opacity: 0.8;
 }
 
 nav ul {
-    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 nav li {
@@ -21,16 +33,34 @@ nav li {
 }
 
 nav a {
+    padding: 10px 20px;
     text-decoration: none;
-    color: white;
+    color: #ec1d24;
+}
+
+#main_section, #cards_section, #rules_section {
+    margin: 0 20px;
+    padding: 10px 20px;
+    background-color: white;
+    border-radius: 5px;
     font-weight: bold;
+    font-size: 18px;    
+    /* opacity: 1; */
 }
 
 .content {
-    padding: 20px;
+    padding: 10px 20px;
 }
 
-.main, .profile, .cards, .rules, #role_txt {
+#main_login_txt, #profile_login_txt,
+#email_txt,
+#coins_number_txt,
+#wins_number_txt,
+#losses_number_txt {
+    font-weight: bold;
+}
+
+.main, .profile, .cards, .rules {
     display: none;
 }
 
@@ -41,7 +71,7 @@ nav a {
 button {
     border: none;
     border-radius: 5px;
-    background-color: red;
+    background-color: #ec1d24;
     color: white;
     font-weight: bold;
     padding: 5px 10px;
@@ -58,4 +88,11 @@ button {
 button:hover {
     background-color: white;
     color: red;
+}
+
+#profile_picture {
+    height: 50px;
+    width: 50px;
+    border-radius: 50%;
+    border: 2px solid white;
 }

@@ -14,19 +14,17 @@
                 <li id="main_section"><a href="#main">Main</a></li>
                 <li id="cards_section"><a href="#cards">Cards</a></li>
                 <li id="rules_section"><a href="#rules">Rules</a></li>
-                <li id="profile_section"><a href="#profile">Profile</a></li>
-                <li id="log_out_section"><a href="#log_out"><button onclick="onLogout()">Log out</button></a></li>
+                <li id="profile_section">
+                    <a href="#profile">
+                        <img id="profile_picture" src="" alt="Profile Picture" />
+                    </a>
+                </li>
             </ul>
         </nav>
 
         <div class="content">
-            <span id="role_txt"></span>
             <div id="main" class="main active">
-                <h2>Hi there!</h2>
-            </div>
-            <div id="profile" class="profile">
-                <h2>Profile</h2>
-                <p>This is the profile section.</p>
+                <h2>Hi there, <span id="main_login_txt"></span>!</h2>
             </div>
             <div id="cards" class="cards">
                 <h2>Cards</h2>
@@ -36,22 +34,24 @@
                 <h2>Rules</h2>
                 <p>This is the rules section.</p>
             </div>
+            <div id="profile" class="profile">
+                <h2>Profile</h2>
+                <p>Your login: <span id="profile_login_txt"></span></p>
+                <p>Your email: <span id="email_txt"></span></p>
+                <p>Number of your coins: <span id="coins_number_txt"></span></p>
+                <p>You won <span id="wins_number_txt"></span> time(s)!</p>
+                <p>You lost <span id="losses_number_txt"></span> time(s)!</p>
+                <a href="#log_out">
+                    <button onclick="onLogout(event)">Log out</button>
+                </a>
+            </div>
         </div>
     </form>
 
     <script>
-        let req = new XMLHttpRequest();
-
-        req.open("GET", `/lobby/role`, true);
-        req.setRequestHeader("Content-Type", "application/json");
-        req.addEventListener("load", () => {
-            const resJSON = JSON.parse(req.responseText);
-
-            document.getElementById("role_txt").innerText = resJSON.role;
-        });
-        req.send();
-
         function onLogout(ev) {
+            ev.preventDefault();
+
             let req = new XMLHttpRequest();
 
             req.open("POST", `/lobby/logout`, true);
@@ -62,6 +62,37 @@
             req.send();
         }
 
+
+        let userDetailsReq = new XMLHttpRequest();
+
+        userDetailsReq.open("GET", `/game-api/account-info`, true);
+        userDetailsReq.setRequestHeader("Content-Type", "application/json");
+        userDetailsReq.addEventListener("load", () => {
+            if (userDetailsReq.status === 200) {
+                const resJSON = JSON.parse(userDetailsReq.responseText);
+
+                const profilePicture = resJSON[0].user_picture;
+                const profilePictureElement = document.getElementById("profile_picture");
+                profilePictureElement.src = `/assets/profile-image/${profilePicture}`;
+
+                const login = resJSON[0].user_login;
+                const email = resJSON[0].user_email;
+                const coins = resJSON[0].user_coins;
+                const wins = resJSON[0].user_wins;
+                const losses = resJSON[0].user_losses;
+
+                document.getElementById("main_login_txt").innerText = login;
+                document.getElementById("profile_login_txt").innerText = login;
+                document.getElementById("email_txt").innerText = email;
+                document.getElementById("coins_number_txt").innerText = coins;
+                document.getElementById("wins_number_txt").innerText = wins;
+                document.getElementById("losses_number_txt").innerText = losses;
+            }
+        });
+
+        userDetailsReq.send();
+
+
         const menuItems = document.querySelectorAll('nav a');
         const contentSections = document.querySelectorAll('.content > div');
 
@@ -69,7 +100,7 @@
             menuItem.addEventListener('click', (e) => {
                 e.preventDefault();
 
-                const targetId = e.target.getAttribute('href').substring(1);
+                const targetId = e.currentTarget.getAttribute('href').substring(1);
 
                 contentSections.forEach((section) => {
                     section.classList.remove('active');
