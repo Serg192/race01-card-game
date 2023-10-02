@@ -4,6 +4,7 @@ const express = require("express");
 const router = express.Router();
 
 const AccountDetails = require("../models/account-details");
+// const User = require("../models/user");
 
 router.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "../views", "lobby.html"));

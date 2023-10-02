@@ -24,7 +24,7 @@
 
         <div class="content">
             <div id="main" class="main active">
-                <h2>Hi there, <span id="login_txt"></span>!</h2>
+                <h2>Hi there, <span id="main_login_txt"></span>!</h2>
             </div>
             <div id="cards" class="cards">
                 <h2>Cards</h2>
@@ -36,7 +36,9 @@
             </div>
             <div id="profile" class="profile">
                 <h2>Profile</h2>
-                <p>This is the profile section.</p>
+                <p>Your login: <span id="profile_login_txt"></span></p>
+                <!-- <p>Your full name: <span id="full_name_txt"></span></p>
+                <p>Your email: <span id="email_txt"></span></p> -->
                 <a href="#log_out">
                     <button onclick="onLogout(event)">Log out</button>
                 </a>
@@ -51,8 +53,10 @@
         loginReq.setRequestHeader("Content-Type", "application/json");
         loginReq.addEventListener("load", () => {
             const resJSON = JSON.parse(loginReq.responseText);
+            const login = resJSON.login;
 
-            document.getElementById("login_txt").innerText = resJSON.login;
+            document.getElementById("main_login_txt").innerText = login;
+            document.getElementById("profile_login_txt").innerText = login;
         });
 
         loginReq.send();
@@ -86,7 +90,6 @@
         });
 
         profilePictureReq.send();
-        
 
         const menuItems = document.querySelectorAll('nav a');
         const contentSections = document.querySelectorAll('.content > div');
