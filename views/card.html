@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link rel="stylesheet" type="text/css" href="card-style.css" />
+        <title>Card</title>
+    </head>
+    
+    <body>
+        <img id="card_picture" src="" alt="Card Picture">
+        <h3><span id="card_name_txt"></span></h3>
+        <p>Class: <span id="card_class_txt"></span></p>
+        <p>
+            Attack: <span id="card_attack_txt"></span><br />
+            Defense: <span id="card_defence_txt"></span><br />
+            Health: <span id="card_health_txt"></span><br />
+        </p>
+        <p>Usage price: <span id="card_usage_price_txt"></span></p>
+        <p>Price: <span id="card_price_txt"></span></p>
+
+        <script>
+            let randPlayerCardReq = new XMLHttpRequest();
+
+            randPlayerCardReq.open("GET", `/game-api/player-rand-card`, true);
+            randPlayerCardReq.setRequestHeader("Content-Type", "application/json");
+            randPlayerCardReq.addEventListener("load", () => {
+                if (randPlayerCardReq.status === 200) {
+                    const resJSON = JSON.parse(randPlayerCardReq.responseText);
+
+                    const cardPicture = resJSON[0].card_picture;
+                    const cardPictureElement = document.getElementById("card_picture");
+                    cardPictureElement.src = `/assets/characters/${cardPicture}`;
+
+                    const cardName = resJSON[0].card_name;
+                    const cardClass = resJSON[0].card_class;
+                    const cardAttack = resJSON[0].card_attack;
+                    const cardDefence = resJSON[0].card_defence;
+                    const cardHealth = resJSON[0].card_health;
+                    const cardUsagePrice = resJSON[0].card_usage_price;
+                    const cardPrice = resJSON[0].card_price;
+
+                    document.getElementById("card_name_txt").innerText = cardName;
+                    document.getElementById("card_class_txt").innerText = cardClass;
+                    document.getElementById("card_attack_txt").innerText = cardAttack;
+                    document.getElementById("card_defence_txt").innerText = cardDefence;
+                    document.getElementById("card_health_txt").innerText = cardHealth;
+                    document.getElementById("card_usage_price_txt").innerText = cardUsagePrice;
+                    document.getElementById("card_price_txt").innerText = cardPrice;
+                }
+            });
+
+            randPlayerCardReq.send();
+        </script>
+    </body>
+</html>

@@ -16,6 +16,13 @@ router.get("/account-info", async (req, res) => {
     .json((await new AccountDetails().getFullAccountInfo(userID))[0]);
 });
 
+// router.get("/card-info", async (req, res) => {
+//   const cardID = jwt.decode(req.cookies.token).id;
+//   res
+//     .status(200)
+//     .json((await new Cards().getCardData(cardID))[0]);
+// });
+
 router.get("/store-items", async (req, res) => {
   const userID = jwt.decode(req.cookies.token).id;
   res.status(200).json((await new UserCards().getNotOwnedCards(userID))[0]);
