@@ -154,6 +154,18 @@ nav a {
   max-width: calc(20% - 50px);
 }
 
+.healer {
+  background-color: rgba(73, 200, 0, 0.5);
+}
+
+.tankman {
+  background-color: rgb(200, 200, 0, 0.5);
+}
+
+.dps {
+  background-color: rgb(200, 0, 0, 0.5);
+}
+
 .card:hover {
   box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
 }
@@ -197,7 +209,7 @@ nav a {
   bottom: 0;
   width: 25px;
   height: 25px;
-  background-color: rgba(224, 33, 39, 0.745);
+  background-color: rgba(224, 33, 39);
   color: white;
 }
 
@@ -212,7 +224,7 @@ nav a {
   bottom: 0;
   width: 25px;
   height: 25px;
-  background-color: rgba(109, 224, 33, 0.745);
+  background-color: rgba(109, 224, 33);
   color: white;
 }
 

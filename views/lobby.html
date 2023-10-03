@@ -136,7 +136,15 @@
           cardContainer.innerHTML = "";
           resJSON.forEach((card) => {
             const cardElement = document.createElement("div");
-            cardElement.className = "card";
+            if (card.card_class === 'healer') {
+              cardElement.className = "card healer";
+            }
+            else if (card.card_class === 'tankman') {
+              cardElement.className = "card tankman";
+            }
+            else if (card.card_class === 'dps') {
+              cardElement.className = "card dps";
+            }
             cardElement.innerHTML = createCardHTML(card);
             cardElement.addEventListener("click", () => {
               handleCardClick(cardElement);
@@ -159,7 +167,15 @@
           storeContainer.innerHTML = "";
           resJSON.forEach((card) => {
             const cardElement = document.createElement("div");
-            cardElement.className = "card";
+            if (card.card_class === 'healer') {
+              cardElement.className = "card healer";
+            }
+            else if (card.card_class === 'tankman') {
+              cardElement.className = "card tankman";
+            }
+            else if (card.card_class === 'dps') {
+              cardElement.className = "card dps";
+            }
             cardElement.innerHTML = createCardHTML(card);
             cardElement.addEventListener("click", () => {
               handleCardClick(cardElement);
