@@ -9,45 +9,52 @@
 
   <body>
     <form action="/lobby" method="POST">
-      <nav>
-        <ul>
-          <li id="main_section"><a href="#main">Main</a></li>
-          <li id="cards_section"><a href="#cards">Cards</a></li>
-          <li id="rules_section"><a href="#rules">Rules</a></li>
-          <li id="profile_section">
-            <a href="#profile">
-              <img id="profile_picture" src="" alt="Profile Picture" />
-            </a>
-          </li>
-        </ul>
-      </nav>
+        <nav>
+            <ul>
+                <li id="main_section"><a href="#main">Main</a></li>
+                <li id="cards_section"><a href="#cards">Cards</a></li>
+                <li id="store_section"><a href="#store">Store</a></li>
+                <li id="rules_section"><a href="#rules">Rules</a></li>
+                <li id="profile_section">
+                    <a href="#profile">
+                        <img id="profile_picture" src="" alt="Profile Picture" />
+                    </a>
+                    <span id="menu_login_txt"></span>
+                </li>
+            </ul>
+        </nav>
 
-      <div class="content">
-        <div id="main" class="main active">
-          <h2>Hi there, <span id="main_login_txt"></span>!</h2>
+        <div class="content">
+            <div id="main" class="main active">
+                <h2>Hi there, <span id="main_login_txt"></span>!</h2>
+                <button type="button" onclick="onPlay()">PLAY</button>
+            </div>
+            <div id="cards" class="cards">
+              <div id="card_container"></div>
+            </div>
+            <div id="store" class="store">
+              <h2>Number of your coins: <span id="coins_number_txt"></span></h2>
+              <div id="store_container"></div>
+            </div>
+            <div id="rules" class="rules">
+                <h2>Rules</h2>
+                <p>This is the rules section.</p>
+            </div>
+            <div id="profile" class="profile">
+                <h2>Profile Detail</h2>
+                <p>Your login: <span id="profile_login_txt"></span></p>
+                <p>Your email: <span id="email_txt"></span></p>
+                <hr />
+                <h2>Profile Statistics</h2>
+                <p>You won <span id="wins_number_txt"></span> time(s)!</p>
+                <p>You lost <span id="losses_number_txt"></span> time(s)!</p>
+                <a href="#log_out">
+                    <button onclick="onLogout(event)">Log out</button>
+                </a>
+            </div>
         </div>
-        <div id="cards" class="cards">
-          <h2>Cards</h2>
-          <p>This is the cards section.</p>
-        </div>
-        <div id="rules" class="rules">
-          <h2>Rules</h2>
-          <p>This is the rules section.</p>
-        </div>
-        <div id="profile" class="profile">
-          <h2>Profile</h2>
-          <p>Your login: <span id="profile_login_txt"></span></p>
-          <p>Your email: <span id="email_txt"></span></p>
-          <p>Number of your coins: <span id="coins_number_txt"></span></p>
-          <p>You won <span id="wins_number_txt"></span> time(s)!</p>
-          <p>You lost <span id="losses_number_txt"></span> time(s)!</p>
-          <a href="#log_out">
-            <button onclick="onLogout(event)">Log out</button>
-          </a>
-        </div>
-      </div>
     </form>
-    <button onclick="onPlay()">PLAY</button>
+    <!-- <button onclick="onPlay()">PLAY</button> -->
     <script src="/socket.io/socket.io.js"></script>
     <script>
       function onLogout(ev) {
@@ -83,6 +90,7 @@
           const wins = resJSON[0].user_wins;
           const losses = resJSON[0].user_losses;
 
+          document.getElementById("menu_login_txt").innerText = login;
           document.getElementById("main_login_txt").innerText = login;
           document.getElementById("profile_login_txt").innerText = login;
           document.getElementById("email_txt").innerText = email;
@@ -94,8 +102,98 @@
 
       userDetailsReq.send();
 
-      const menuItems = document.querySelectorAll("nav a");
-      const contentSections = document.querySelectorAll(".content > div");
+
+      function createCardHTML(card) {
+        const {
+          card_name,
+          card_class,
+          card_attack,
+          card_defence,
+          card_health,
+          card_usage_price,
+          card_price,
+          card_picture,
+        } = card;
+        return `
+          <img id="card_picture" src="/assets/characters/${card_picture}" alt="Card Picture" />
+          <span id="card_class_txt">${card_class}</span>
+          <span id="card_attack_txt">${card_attack}</span>
+          <span id="card_defence_txt">${card_defence}</span>
+          <span id="card_health_txt">${card_health}</span>
+          <span id="card_usage_price_txt">${card_usage_price}</span>
+          <span id="card_price_txt">${card_price}</span>
+          <span id="card_name_txt">${card_name}</span>`;
+        }
+
+      const cardContainer = document.getElementById("card_container");
+
+      let playerCards = new XMLHttpRequest();
+      playerCards.open("GET", "/game-api/player-cards", true);
+
+      playerCards.addEventListener("load", () => {
+        if (playerCards.status == 200) {
+          const resJSON = JSON.parse(playerCards.responseText);
+          cardContainer.innerHTML = "";
+          resJSON.forEach((card) => {
+            const cardElement = document.createElement("div");
+            if (card.card_class === 'healer') {
+              cardElement.className = "card healer";
+            }
+            else if (card.card_class === 'tankman') {
+              cardElement.className = "card tankman";
+            }
+            else if (card.card_class === 'dps') {
+              cardElement.className = "card dps";
+            }
+            cardElement.innerHTML = createCardHTML(card);
+            cardElement.addEventListener("click", () => {
+              handleCardClick(cardElement);
+            });
+            cardContainer.appendChild(cardElement);
+          });
+        }
+      });
+      playerCards.send();
+
+
+      const storeContainer = document.getElementById("store_container");
+
+      let storeItems = new XMLHttpRequest();
+      storeItems.open("GET", "/game-api/store-items", true);
+
+      storeItems.addEventListener("load", () => {
+        if (storeItems.status == 200) {
+          const resJSON = JSON.parse(storeItems.responseText);
+          storeContainer.innerHTML = "";
+          resJSON.forEach((card) => {
+            const cardElement = document.createElement("div");
+            if (card.card_class === 'healer') {
+              cardElement.className = "card healer";
+            }
+            else if (card.card_class === 'tankman') {
+              cardElement.className = "card tankman";
+            }
+            else if (card.card_class === 'dps') {
+              cardElement.className = "card dps";
+            }
+            cardElement.innerHTML = createCardHTML(card);
+            cardElement.addEventListener("click", () => {
+              handleCardClick(cardElement);
+            });
+            storeContainer.appendChild(cardElement);
+          });
+        }
+      });
+      storeItems.send();
+
+      function handleCardClick(card) {
+        const cardNameElement = card.querySelector("#card_name_txt");
+        const cardName = cardNameElement.textContent;
+        console.log(`Clicked on card: ${cardName}`);
+      }
+
+      const menuItems = document.querySelectorAll('nav a');
+      const contentSections = document.querySelectorAll('.content > div');
 
       menuItems.forEach((menuItem) => {
         menuItem.addEventListener("click", (e) => {

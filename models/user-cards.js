@@ -24,10 +24,19 @@ class UserCards extends Model {
     );
   }
 
+  // async getNotOwnedCards(userId) {
+  //   return await super.execute(
+  //     `SELECT * FROM cards LEFT JOIN user_cards ON cards.id = user_cards.user_id AND user_cards.user_id = ${userId}
+  //     WHERE user_cards.user_id IS NULL`
+  //   );
+  // }
+
+  // Rewritten to select only those, that certain player doesn't have
   async getNotOwnedCards(userId) {
     return await super.execute(
-      `SELECT * FROM cards LEFT JOIN user_cards ON cards.id = user_cards.user_id AND user_cards.user_id = ${userId}
-      WHERE user_cards.user_id IS NULL`
+      `SELECT * FROM cards WHERE id NOT IN (
+        SELECT card_id FROM user_cards WHERE user_id = ${userId}
+      )`
     );
   }
 }
