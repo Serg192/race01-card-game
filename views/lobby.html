@@ -19,6 +19,7 @@
                     <a href="#profile">
                         <img id="profile_picture" src="" alt="Profile Picture" />
                     </a>
+                    <span id="menu_login_txt"></span>
                 </li>
             </ul>
         </nav>
@@ -26,34 +27,25 @@
         <div class="content">
             <div id="main" class="main active">
                 <h2>Hi there, <span id="main_login_txt"></span>!</h2>
+                <button onclick="onPlay()">PLAY</button>
             </div>
-            <template id="card-template">
-              <div id="cards" class="cards">
-                  <img id="card_picture" src="" alt="Card Picture">
-                  <h3><span id="card_name_txt"></span></h3>
-                  <p>Class: <span id="card_class_txt"></span></p>
-                  <p>
-                      Attack: <span id="card_attack_txt"></span><br />
-                      Defense: <span id="card_defence_txt"></span><br />
-                      Health: <span id="card_health_txt"></span><br />
-                  </p>
-                  <p>Usage price: <span id="card_usage_price_txt"></span></p>
-                  <p>Price: <span id="card_price_txt"></span></p>
-              </div>
-            </template>
+            <div id="cards" class="cards">
+              <div id="card_container"></div>
+            </div>
             <div id="store" class="store">
-              <h2>Store</h2>
-              <p>This is the store section.</p>
+              <h2>Number of your coins: <span id="coins_number_txt"></span></h2>
+              <div id="store_container"></div>
             </div>
             <div id="rules" class="rules">
                 <h2>Rules</h2>
                 <p>This is the rules section.</p>
             </div>
             <div id="profile" class="profile">
-                <h2>Profile</h2>
+                <h2>Profile Detail</h2>
                 <p>Your login: <span id="profile_login_txt"></span></p>
                 <p>Your email: <span id="email_txt"></span></p>
-                <p>Number of your coins: <span id="coins_number_txt"></span></p>
+                <hr />
+                <h2>Profile Statistics</h2>
                 <p>You won <span id="wins_number_txt"></span> time(s)!</p>
                 <p>You lost <span id="losses_number_txt"></span> time(s)!</p>
                 <a href="#log_out">
@@ -62,7 +54,7 @@
             </div>
         </div>
     </form>
-    <button onclick="onPlay()">PLAY</button>
+    <!-- <button onclick="onPlay()">PLAY</button> -->
     <script src="/socket.io/socket.io.js"></script>
     <script>
       function onLogout(ev) {
@@ -98,6 +90,7 @@
           const wins = resJSON[0].user_wins;
           const losses = resJSON[0].user_losses;
 
+          document.getElementById("menu_login_txt").innerText = login;
           document.getElementById("main_login_txt").innerText = login;
           document.getElementById("profile_login_txt").innerText = login;
           document.getElementById("email_txt").innerText = email;
@@ -110,53 +103,79 @@
       userDetailsReq.send();
 
 
-      let randPlayerCardReq = new XMLHttpRequest();
+      function createCardHTML(card) {
+        const {
+          card_name,
+          card_class,
+          card_attack,
+          card_defence,
+          card_health,
+          card_usage_price,
+          card_price,
+          card_picture,
+        } = card;
+        return `
+          <img id="card_picture" src="/assets/characters/${card_picture}" alt="Card Picture" />
+          <span id="card_class_txt">${card_class}</span>
+          <span id="card_attack_txt">${card_attack}</span>
+          <span id="card_defence_txt">${card_defence}</span>
+          <span id="card_health_txt">${card_health}</span>
+          <span id="card_usage_price_txt">${card_usage_price}</span>
+          <span id="card_price_txt">${card_price}</span>
+          <span id="card_name_txt">${card_name}</span>`;
+        }
 
-      randPlayerCardReq.open("GET", `/game-api/player-rand-card`, true);
-      randPlayerCardReq.setRequestHeader("Content-Type", "application/json");
-      randPlayerCardReq.addEventListener("load", () => {
-          if (randPlayerCardReq.status === 200) {
-              const resJSON = JSON.parse(randPlayerCardReq.responseText);
+      const cardContainer = document.getElementById("card_container");
 
-              const cardTemplate = document.querySelector('#card-template');
-              const cardClone = document.importNode(cardTemplate.content, true);
+      let playerCards = new XMLHttpRequest();
+      playerCards.open("GET", "/game-api/player-cards", true);
 
-              const cardPicture = resJSON[0].card_picture;
-              const cardName = resJSON[0].card_name;
-              const cardClass = resJSON[0].card_class;
-              const cardAttack = resJSON[0].card_attack;
-              const cardDefence = resJSON[0].card_defence;
-              const cardHealth = resJSON[0].card_health;
-              const cardUsagePrice = resJSON[0].card_usage_price;
-              const cardPrice = resJSON[0].card_price;
-
-              const cardPictureElement = cardClone.querySelector('#card_picture');
-              cardPictureElement.src = `/assets/characters/${cardPicture}`;
-
-              const cardNameElement = cardClone.querySelector('#card_name_txt');
-              const cardClassElement = cardClone.querySelector('#card_class_txt');
-              const cardAttackElement = cardClone.querySelector('#card_attack_txt');
-              const cardDefenceElement = cardClone.querySelector('#card_defence_txt');
-              const cardHealthElement = cardClone.querySelector('#card_health_txt');
-              const cardUsagePriceElement = cardClone.querySelector('#card_usage_price_txt');
-              const cardPriceElement = cardClone.querySelector('#card_price_txt');
-
-              cardNameElement.textContent = resJSON[0].card_name;
-              cardClassElement.textContent = resJSON[0].card_class;
-              cardAttackElement.textContent = resJSON[0].card_attack;
-              cardDefenceElement.textContent = resJSON[0].card_defence;
-              cardHealthElement.textContent = resJSON[0].card_health;
-              cardUsagePriceElement.textContent = resJSON[0].card_usage_price;
-              cardPriceElement.textContent = resJSON[0].card_price;
-
-              const cardContainer = document.querySelector('.content');
-              cardContainer.appendChild(cardClone);
-          }
+      playerCards.addEventListener("load", () => {
+        if (playerCards.status == 200) {
+          const resJSON = JSON.parse(playerCards.responseText);
+          cardContainer.innerHTML = "";
+          resJSON.forEach((card) => {
+            const cardElement = document.createElement("div");
+            cardElement.className = "card";
+            cardElement.innerHTML = createCardHTML(card);
+            cardElement.addEventListener("click", () => {
+              handleCardClick(cardElement);
+            });
+            cardContainer.appendChild(cardElement);
+          });
+        }
       });
+      playerCards.send();
 
-      randPlayerCardReq.send();
 
-      
+      const storeContainer = document.getElementById("store_container");
+
+      let storeItems = new XMLHttpRequest();
+      storeItems.open("GET", "/game-api/store-items", true);
+
+      storeItems.addEventListener("load", () => {
+        if (storeItems.status == 200) {
+          const resJSON = JSON.parse(storeItems.responseText);
+          storeContainer.innerHTML = "";
+          resJSON.forEach((card) => {
+            const cardElement = document.createElement("div");
+            cardElement.className = "card";
+            cardElement.innerHTML = createCardHTML(card);
+            cardElement.addEventListener("click", () => {
+              handleCardClick(cardElement);
+            });
+            storeContainer.appendChild(cardElement);
+          });
+        }
+      });
+      storeItems.send();
+
+      function handleCardClick(card) {
+        const cardNameElement = card.querySelector("#card_name_txt");
+        const cardName = cardNameElement.textContent;
+        console.log(`Clicked on card: ${cardName}`);
+      }
+
       const menuItems = document.querySelectorAll('nav a');
       const contentSections = document.querySelectorAll('.content > div');
 
