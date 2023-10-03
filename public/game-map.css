@@ -12,6 +12,7 @@ html, body {
 
 body {
   background-color: rgb(183, 165, 165);
+  user-select: none;
 }
 
 .game-container {
@@ -73,15 +74,22 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 5px;
-  width: 500px;
+  gap: 10px;
+  width: 600px;
+  height: 150px;
   padding: 5px;
+  background-color: rgb(223, 97, 97);
   border: solid 2px purple;
+}
+
+.current-turn {
+  display: flex;
+  flex-direction: column;
 }
 
 .timer {
   display: flex;
-  width: 150px;
+  width: 100px;
   height: 50px;
   align-items: center;
   justify-content: center;
@@ -89,8 +97,10 @@ body {
 }
 
 .board {
-  display: flex;
+  /* display: flex;
   flex-direction: column;
+  align-items: center; */
+  /* justify-content: space-between; */
   padding: 10px;
   border: solid 2px orange;
   gap: 15px;
@@ -100,12 +110,60 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 15px;
+  height: 200px;
+  column-gap: 50px;
+  background-color: rgb(223, 97, 97);
+  border: solid 1px black;
 }
 
 .card {
-  width: 100px;
-  height: 150px;
+  width: 120px;
+  height: 180px;
   background-color: brown;
+  border: solid 1px black;
 }
 
+.cards-in-hand .card {
+  width: 90px;
+  height: 135px;
+  overflow: hidden;
+  transition: width 0.3s, height 0.3s, transform 0.5s;
+}
+
+.cards-in-hand.your .card[draggable="true"]:hover {
+  width: 120px;
+  height: 180px;
+  transform: translateY(-20px);
+  z-index: 1;
+}
+
+.your {
+  background-color: rgb(133, 231, 133);
+}
+
+.your .card {
+  background-color: green;
+}
+
+div[draggable="false"] {
+  opacity: 0.5;
+}
+
+.board-section.your .card:hover {
+  transition: width 0.3s, height 0.3s, transform 0.5s;
+}
+
+.board-section.your .card:hover {
+  transform: scale(1.1);
+  box-shadow: 0 0 10px rgba(255, 255, 0, 0.8);
+  animation: glow 1s infinite alternate;
+}
+
+@keyframes glow {
+  0% {
+    box-shadow: 0 0 10px rgba(255, 255, 0, 0.8);
+  }
+  100% {
+    box-shadow: 0 0 50px rgba(255, 255, 0, 0.8);
+  }
+}

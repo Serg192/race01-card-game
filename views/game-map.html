@@ -18,7 +18,7 @@
         </div>
         <div class="info">
           <div class="user-info">
-            <img src="/assets/profile-image/1.png" alt="opponent-img">
+            <img id="opponent_img"src="/assets/profile-image/1.png" alt="opponent-img">
             <span id="opponent_name">Opponent Name</span>
           </div>
           <div class="indicators">
@@ -30,7 +30,7 @@
           <span>Time</span>
         </div>
       </div>
-  
+       
       <div class="board">
         <div class="board-section opponent">
           <div class="card"></div>
@@ -38,18 +38,17 @@
           <div class="card"></div>
         </div>
         <div class="board-section your">
-          <div class="card"></div>
-          <div class="card"></div>
-          <div class="card"></div>
-          <div class="card"></div>
-          <div class="card"></div>
+
         </div>
       </div>
 
       <div class="player-info-container">
-        <div class="cards-in-hand">
-          <div class="card"></div>
-          <div class="card"></div>
+        <div class="cards-in-hand your">
+          <div id="card-1" class="card" draggable="true">Card 1</div>
+          <div id="card-2" class="card" draggable="true">Card 2</div>
+          <div id="card-3" class="card" draggable="true">Card 3</div>
+          <div class="card" draggable="false">Card 4</div>
+          <div class="card" draggable="false">Card 5</div>
         </div>
         <div class="info">
           <div class="user-info">
@@ -61,10 +60,90 @@
             <span class="mp" id="your_mp">100</span>
           </div>
         </div>
-        <div class="timer">
-          <span>Time</span>
+        <div class="current-turn">
+          <div class="timer">
+            <span>Time</span>
+          </div>
+          <button class="turn-button" id="turn-button">Your turn</button>
         </div>
       </div>
     </div>
+    <script>
+      const yourHand = document.querySelector('.cards-in-hand.your');
+      const yourBoardSection = document.querySelector('.board-section.your');
+      const opponentFace = document.getElementById('opponent_img');
+
+      yourHand.addEventListener('dragstart', (event) => {
+        const target = event.target;
+        if (target.draggable) {
+          event.dataTransfer.setData('text/plain', target.id);
+          target.classList.add('dragging');
+        }
+      });
+
+      yourHand.addEventListener('dragend', (event) => {
+        const target = event.target;
+        if (target.draggable) {
+          target.classList.remove('dragging');
+        }
+      });
+
+      yourBoardSection.addEventListener('dragover', (event) => {
+        event.preventDefault();
+      });
+
+      yourBoardSection.addEventListener('drop', (event) => {
+        event.preventDefault();
+        const data = event.dataTransfer.getData('text/plain');
+        const draggableElement = document.getElementById(data);
+
+        if (yourBoardSection.contains(event.target) && draggableElement) {
+          yourBoardSection.appendChild(draggableElement);
+        }
+      });
+
+      yourBoardSection.addEventListener('dragstart', (event) => {
+        const draggableElement = event.target;
+        draggableElement.classList.add('dragging');
+        event.dataTransfer.setData('text/plain', draggableElement.id);
+      });
+
+      yourBoardSection.addEventListener('dragend', (event) => {
+        const draggableElement = event.target;
+        draggableElement.classList.remove('dragging');
+      });
+
+      opponentFace.addEventListener('dragover', (event) => {
+        event.preventDefault();
+      });
+
+      opponentFace.addEventListener('drop', (event) => {
+        event.preventDefault();
+        const data = event.dataTransfer.getData('text/plain');
+        const draggableElement = document.getElementById(data);
+
+        if (opponentFace.contains(event.target) && draggableElement) {
+          draggableElement.style.display = 'none';
+        }
+      });
+
+
+      // player-turn 
+      const button = document.getElementById('turn-button');
+      button.addEventListener('click', togglePlayerTurn);
+
+      function togglePlayerTurn() {
+        const text = button.textContent;
+        console.log(text);
+        if (text === "Your turn") {
+          button.textContent = "Opponent's turn";
+          button.setAttribute('disabled', true);
+        } else {
+          button.textContent = "Your turn";
+          button.removeAttribute('disabled');
+        }
+      }
+
+    </script>
   </body>
 </html>
