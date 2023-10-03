@@ -1,0 +1,111 @@
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  height: 100%;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+body {
+  background-color: rgb(183, 165, 165);
+}
+
+.game-container {
+  display: flex;
+  flex-direction: column;
+  /* align-items: center; */
+  justify-content: space-between;
+  height: 100vh;
+  border: solid 2px black;
+}
+
+.player-info-container {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  border: solid 2px red;
+}
+
+.info {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  border: solid 2px rgb(255, 0, 174);
+}
+
+.user-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border: solid 2px green;
+}
+
+.user-info img {
+  height: 100px;
+  width: 100px;
+  border: solid 2px yellow;
+}
+
+.indicators {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border: solid 2px blue;
+}
+
+.hp {
+  color: red;
+}
+
+.mp {
+  color: blue;
+}
+
+.cards-in-hand {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  width: 500px;
+  padding: 5px;
+  border: solid 2px purple;
+}
+
+.timer {
+  display: flex;
+  width: 150px;
+  height: 50px;
+  align-items: center;
+  justify-content: center;
+  border: solid 2px palevioletred;
+}
+
+.board {
+  display: flex;
+  flex-direction: column;
+  padding: 10px;
+  border: solid 2px orange;
+  gap: 15px;
+}
+
+.board-section {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+}
+
+.card {
+  width: 100px;
+  height: 150px;
+  background-color: brown;
+}
+
