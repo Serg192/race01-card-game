@@ -95,6 +95,30 @@
             <button id="buyButton">BUY</button>
           </div>
         </div>
+        <div id="cards" class="cards">
+          <div id="card_container"></div>
+        </div>
+        <div id="store" class="store">
+          <h2>Number of your coins: <span id="coins_number_txt"></span></h2>
+          <div id="store_container"></div>
+        </div>
+        <div id="rules" class="rules">
+          <h2>Rules</h2>
+          <p>This is the rules section.</p>
+        </div>
+        <div id="profile" class="profile">
+          <h2>Profile Detail</h2>
+          <p>Your login: <span id="profile_login_txt"></span></p>
+          <p>Your email: <span id="email_txt"></span></p>
+          <hr />
+          <h2>Profile Statistics</h2>
+          <p>You won <span id="wins_number_txt"></span> time(s)!</p>
+          <p>You lost <span id="losses_number_txt"></span> time(s)!</p>
+          <a href="#log_out">
+            <button onclick="onLogout(event)">Log out</button>
+          </a>
+        </div>
+      </div>
     </form>
     <script src="/socket.io/socket.io.js"></script>
     <script>
@@ -143,7 +167,6 @@
 
       userDetailsReq.send();
 
-
       function createCardHTML(card) {
         const {
           card_name,
@@ -164,7 +187,7 @@
           <span id="card_usage_price_txt">${card_usage_price}</span>
           <span id="card_price_txt">${card_price}</span>
           <span id="card_name_txt">${card_name}</span>`;
-        }
+      }
 
       const cardContainer = document.getElementById("card_container");
 
@@ -177,13 +200,11 @@
           cardContainer.innerHTML = "";
           resJSON.forEach((card) => {
             const cardElement = document.createElement("div");
-            if (card.card_class === 'healer') {
+            if (card.card_class === "healer") {
               cardElement.className = "card healer";
-            }
-            else if (card.card_class === 'tankman') {
+            } else if (card.card_class === "tankman") {
               cardElement.className = "card tankman";
-            }
-            else if (card.card_class === 'dps') {
+            } else if (card.card_class === "dps") {
               cardElement.className = "card dps";
             }
             cardElement.innerHTML = createCardHTML(card);
@@ -192,7 +213,6 @@
         }
       });
       playerCards.send();
-
 
       const storeContainer = document.getElementById("store_container");
 
@@ -205,13 +225,11 @@
           storeContainer.innerHTML = "";
           resJSON.forEach((card) => {
             const cardElement = document.createElement("div");
-            if (card.card_class === 'healer') {
+            if (card.card_class === "healer") {
               cardElement.className = "card healer";
-            }
-            else if (card.card_class === 'tankman') {
+            } else if (card.card_class === "tankman") {
               cardElement.className = "card tankman";
-            }
-            else if (card.card_class === 'dps') {
+            } else if (card.card_class === "dps") {
               cardElement.className = "card dps";
             }
             cardElement.innerHTML = createCardHTML(card);
@@ -258,9 +276,8 @@
         });
       }
 
-
-      const menuItems = document.querySelectorAll('nav a');
-      const contentSections = document.querySelectorAll('.content > div');
+      const menuItems = document.querySelectorAll("nav a");
+      const contentSections = document.querySelectorAll(".content > div");
 
       menuItems.forEach((menuItem) => {
         menuItem.addEventListener("click", (e) => {
@@ -276,21 +293,21 @@
         });
       });
 
-      //**********************************************************************
-      //soket io stuff
-      let socket = io();
-      let activeSearch = false;
+      // //**********************************************************************
+      // //soket io stuff
+      // let socket = io();
+      // let activeSearch = false;
 
-      socket.on("connect_error", function (err) {
-        //handle error
-        console.log(err);
-      });
+      // socket.on("connect_error", function (err) {
+      //   //handle error
+      //   console.log(err);
+      // });
 
-      socket.on("room-found", (data) => {
-        console.log(
-          `Game start: first move-> ${data.first}, opponent-> ${data.second}`
-        );
-      });
+      // socket.on("room-found", (data) => {
+      //   console.log(
+      //     `Game start: first move-> ${data.first}, opponent-> ${data.second}`
+      //   );
+      // });
 
       function onPlay(e) {
         const loadingDiv = document.getElementById("loading");
@@ -306,8 +323,9 @@
             playButton.disabled = false;
         }
         activeSearch = !activeSearch;
-    }
 
+        window.location.href = "/game-map";
+      }
     </script>
   </body>
 </html>

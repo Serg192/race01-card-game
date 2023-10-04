@@ -28,6 +28,7 @@ class AccountDetails extends Model {
   async createEntryFor(id) {
     return await super.create({
       user_id: id,
+      user_picture: `${Math.floor(Math.random() * 4) + 1}.png`,
     });
   }
 

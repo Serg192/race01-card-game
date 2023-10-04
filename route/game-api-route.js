@@ -30,7 +30,17 @@ router.get("/player-cards", async (req, res) => {
 
 router.get("/player-rand-card", async (req, res) => {
   const userID = jwt.decode(req.cookies.token).id;
-  res.status(200).json((await new UserCards().getRandomUserCard(userID))[0]);
+  const count = req.query.count;
+  res
+    .status(200)
+    .json(
+      (
+        await new UserCards().getRandomUserCard(
+          userID,
+          count == undefined ? 1 : count
+        )
+      )[0]
+    );
 });
 
 router.post("/buy-card", async (req, res) => {

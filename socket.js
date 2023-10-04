@@ -38,6 +38,22 @@ function initSocket(server) {
     socket.on("stop-search-room", (data) => {
       onStopSearch(io, socket, data);
     });
+
+    socket.on("my-picture", (data) => {
+      onOpponentImage(io, socket, data);
+    });
+
+    socket.on("card-dropped", (data) => {
+      onCardDropped(io, socket, data);
+    });
+
+    socket.on("next-turn", (data) => {
+      onNextTurn(io, socket, data);
+    });
+
+    socket.on("my-timer", (data) => {
+      onTimer(io, socket, data);
+    });
   });
 
   return io;
@@ -45,7 +61,7 @@ function initSocket(server) {
 
 let usersSearchingForRoom = [];
 function onSearchRoom(io, soсket, data) {
-  console.log("User: " + data.login + " searching for room");
+  if (usersSearchingForRoom.includes(data.login)) return;
   usersSearchingForRoom.push(data.login);
   soсket.join(`${usersSearchingForRoom[0]} room`);
   if (usersSearchingForRoom.length == 2) {
@@ -62,6 +78,26 @@ function onStopSearch(io, soсket, data) {
   usersSearchingForRoom = usersSearchingForRoom.filter(
     (login) => login != data.login
   );
+}
+
+function onOpponentImage(io, socket, data) {
+  socket.broadcast
+    .to(data.room)
+    .emit("opponent-picture", { picture: data.picture });
+}
+
+function onCardDropped(io, socket, data) {
+  socket.broadcast
+    .to(data.room)
+    .emit("opponent-dropped-a-card", { cardID: data.cardID });
+}
+
+function onNextTurn(io, socket, data) {
+  socket.broadcast.to(data.room).emit("my-turn");
+}
+
+function onTimer(io, socket, data) {
+  socket.broadcast.to(data.room).emit("opponent-timer", { sec: data.sec });
 }
 
 module.exports = { initSocket };

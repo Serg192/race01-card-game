@@ -13,14 +13,14 @@ class UserCards extends Model {
     );
   }
 
-  async getRandomUserCard(userId) {
+  async getRandomUserCard(userId, count = 1) {
     return await super.execute(
       `SELECT cards.*
        FROM user_cards 
        LEFT JOIN cards ON user_cards.card_id = cards.id
        WHERE user_cards.user_id = ${userId}
        ORDER BY RAND()
-       LIMIT 1`
+       LIMIT ${count}`
     );
   }
 
