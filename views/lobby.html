@@ -310,19 +310,19 @@
       // });
 
       function onPlay(e) {
-        const loadingDiv = document.getElementById("loading");
-        const playButton = document.querySelector(".content button");
+        // const loadingDiv = document.getElementById("loading");
+        // const playButton = document.querySelector(".content button");
 
-        if (!activeSearch) {
-            socket.emit("search-room", { login: login });
-            loadingDiv.style.display = "block";
-            playButton.disabled = true;
-        } else {
-            socket.emit("stop-search-room", { login: login });
-            loadingDiv.style.display = "none";
-            playButton.disabled = false;
-        }
-        activeSearch = !activeSearch;
+        // if (!activeSearch) {
+        //     socket.emit("search-room", { login: login });
+        //     loadingDiv.style.display = "block";
+        //     playButton.disabled = true;
+        // } else {
+        //     socket.emit("stop-search-room", { login: login });
+        //     loadingDiv.style.display = "none";
+        //     playButton.disabled = false;
+        // }
+        // activeSearch = !activeSearch;
 
         window.location.href = "/game-map";
       }
