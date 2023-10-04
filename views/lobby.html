@@ -28,6 +28,10 @@
             <div id="main" class="main active">
                 <h2>Hi there, <span id="main_login_txt"></span>!</h2>
                 <button type="button" onclick="onPlay()">PLAY</button>
+                <div id="loading">
+                  <p>Searching for the opponent...</p>
+                  <img src="assets/loading.gif" alt="Loading" />
+                </div>
             </div>
             <div id="cards" class="cards">
               <div id="card_container"></div>
@@ -49,12 +53,18 @@
                 <p>You won <span id="wins_number_txt"></span> time(s)!</p>
                 <p>You lost <span id="losses_number_txt"></span> time(s)!</p>
                 <a href="#log_out">
-                    <button onclick="onLogout(event)">Log out</button>
+                    <button onclick="onLogout(event)">Log Out</button>
                 </a>
-            </div>
+            </div>        
+        </div>
+        <div id="buyModal" class="modal">
+          <div class="modal-content">
+            <span class="close">&times;</span>
+            <p id="questionToBuy">Do you want to buy this card?</p>
+            <button id="buyButton">BUY</button>
+          </div>
         </div>
     </form>
-    <!-- <button onclick="onPlay()">PLAY</button> -->
     <script src="/socket.io/socket.io.js"></script>
     <script>
       function onLogout(ev) {
@@ -146,9 +156,6 @@
               cardElement.className = "card dps";
             }
             cardElement.innerHTML = createCardHTML(card);
-            cardElement.addEventListener("click", () => {
-              handleCardClick(cardElement);
-            });
             cardContainer.appendChild(cardElement);
           });
         }
@@ -186,11 +193,30 @@
       });
       storeItems.send();
 
+      
       function handleCardClick(card) {
         const cardNameElement = card.querySelector("#card_name_txt");
         const cardName = cardNameElement.textContent;
-        console.log(`Clicked on card: ${cardName}`);
+
+        const buyModal = document.getElementById("buyModal");
+        buyModal.style.display = "block";
+
+        const buyButton = document.getElementById("buyButton");
+        buyButton.addEventListener("click", () => {
+        });
+
+        const closeButton = document.querySelector(".close");
+        closeButton.addEventListener("click", () => {
+          buyModal.style.display = "none";
+        });
+
+        window.addEventListener("click", (event) => {
+          if (event.target === buyModal) {
+            buyModal.style.display = "none";
+          }
+        });
       }
+
 
       const menuItems = document.querySelectorAll('nav a');
       const contentSections = document.querySelectorAll('.content > div');
@@ -226,10 +252,21 @@
       });
 
       function onPlay(e) {
-        if (!activeSearch) socket.emit("search-room", { login: login });
-        else socket.emit("stop-search-room", { login: login });
+        const loadingDiv = document.getElementById("loading");
+        const playButton = document.querySelector(".content button");
+
+        if (!activeSearch) {
+            socket.emit("search-room", { login: login });
+            loadingDiv.style.display = "block";
+            playButton.disabled = true;
+        } else {
+            socket.emit("stop-search-room", { login: login });
+            loadingDiv.style.display = "none";
+            playButton.disabled = false;
+        }
         activeSearch = !activeSearch;
-      }
+    }
+
     </script>
   </body>
 </html>

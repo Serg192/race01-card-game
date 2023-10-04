@@ -77,6 +77,10 @@ nav a {
 }
 
 #coins_number_txt {
+  border: 2px solid goldenrod;
+  background-color: gold;
+  border-radius: 50%;
+  padding: 10px 5px;
   color: #ec1d24;
 }
 
@@ -98,6 +102,12 @@ nav a {
 #rules_section:hover,
 #profile_section:hover {
   opacity: 0.5;
+}
+
+#loading {
+  display: none;
+  margin-top: 50px;
+  font-weight: bold;
 }
 
 .profile button,
@@ -147,11 +157,14 @@ nav a {
   border-radius: 20px;
   margin: 10px;
   padding: 15px;
-  cursor: pointer;
   position: relative;
   flex-basis: calc(20% - 50px);
   flex-grow: 1;
   max-width: calc(20% - 50px);
+}
+
+#store_container .card {
+  cursor: pointer;
 }
 
 .healer {
@@ -243,5 +256,67 @@ nav a {
   height: 30px;
   border: 2px solid goldenrod;
   background-color: gold;
+}
+
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.modal-content {
+  background-color: rgb(80, 80, 90);
+  margin: 20% auto;
+  padding: 20px;
+  border: none;
+  border-radius: 20px;
+  width: 25%;
+  height: 25%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+}
+
+.close {
+  background-color: rgba(100, 100, 110, 0.5);
+  border-radius: 50%;
+  padding: 7px 15px;
+  position: absolute;
+  top: 10px;
+  right: 20px;
+  cursor: pointer;
+  color: red;
+  font-size: 28px;
+  font-weight: bold;
+}
+
+.close:hover {
+  color: rgb(185, 0, 0);
+  text-decoration: none;
+}
+
+#questionToBuy {
+  text-align: center;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+#buyButton {
+  background-color: #4caf50;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: bold;
 }
 
