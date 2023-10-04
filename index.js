@@ -41,6 +41,10 @@ app.get("/", (req, res) => {
   res.redirect("/login");
 });
 
+app.get("/game-map", jwtAuthMid, (req, res) => {
+  res.sendFile(__dirname + "/views/game-map.html");
+});
+
 app.get("*", (req, res) => {
   res.sendFile(__dirname + "/views/not-found.html");
 });

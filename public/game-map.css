@@ -1,11 +1,11 @@
-
 * {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
 }
 
-html, body {
+html,
+body {
   height: 100%;
   font-family: Arial, Helvetica, sans-serif;
 }
@@ -13,6 +13,40 @@ html, body {
 body {
   background-color: rgb(183, 165, 165);
   user-select: none;
+}
+
+.game-search {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  padding: 20px;
+  border: 1px solid #ccc;
+}
+
+.game-search img {
+  width: 100px;
+  height: auto;
+}
+
+.game-search div {
+  margin-top: 10px;
+  font-weight: bold;
+}
+
+.game-search button {
+  margin-top: 10px;
+  background-color: #007bff;
+  height: 30px;
+  color: #fff;
+  padding: 5px 10px;
+  border: none;
+  cursor: pointer;
+}
+
+.game-search button:hover {
+  background-color: #0056b3;
 }
 
 .game-container {
@@ -116,12 +150,129 @@ body {
   border: solid 1px black;
 }
 
+/***************************/
+
+#card_container #card_price_txt,
+#card_class_txt {
+  display: none;
+}
+
 .card {
+  display: flex;
   width: 120px;
   height: 180px;
   background-color: brown;
   border: solid 1px black;
+
+  flex-direction: column;
+  align-items: center;
+  /* margin: 10px;
+  padding: 15px; */
+  cursor: pointer;
+  position: relative;
+  /* flex-basis: calc(20% - 50px); */
+  /* flex-grow: 1; */
 }
+
+.healer {
+  background-color: rgba(73, 200, 0, 0.5);
+}
+
+.tankman {
+  background-color: rgb(200, 200, 0, 0.5);
+}
+
+.dps {
+  background-color: rgb(200, 0, 0, 0.5);
+}
+
+.card:hover {
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+}
+
+#card_picture {
+  height: 100%;
+  width: 100%;
+  margin: auto;
+  user-select: none;
+}
+
+#card_name_txt {
+  position: absolute;
+  font-size: 16px;
+  text-decoration: underline;
+  font-weight: bold;
+  color: white;
+  bottom: 40px;
+}
+
+#card_attack_txt,
+#card_health_txt,
+#card_defence_txt,
+#card_usage_price_txt,
+#card_price_txt {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  background-color: white;
+  border-radius: 50%;
+  padding: 5px;
+  font-size: 16px;
+  font-weight: bold;
+  color: #ec1d24;
+}
+
+#card_attack_txt {
+  left: 0;
+  bottom: 0;
+  width: 25px;
+  height: 25px;
+  background-color: rgba(224, 33, 39);
+  color: white;
+}
+
+#card_health_txt {
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: 0;
+}
+
+#card_defence_txt {
+  right: 0;
+  bottom: 0;
+  width: 25px;
+  height: 25px;
+  background-color: rgba(109, 224, 33);
+  color: white;
+}
+
+#card_usage_price_txt {
+  left: 0;
+  top: 0;
+  width: 30px;
+  height: 30px;
+  border: 2px solid lightgray;
+}
+
+#card_price_txt {
+  right: 0;
+  top: 0;
+  width: 30px;
+  height: 30px;
+  border: 2px solid goldenrod;
+  background-color: gold;
+}
+
+/************************/
+/* .card {
+  width: 120px;
+  height: 180px;
+  background-color: brown;
+  border: solid 1px black;
+} */
 
 .cards-in-hand .card {
   width: 90px;
@@ -130,20 +281,20 @@ body {
   transition: width 0.3s, height 0.3s, transform 0.5s;
 }
 
-.cards-in-hand.your .card[draggable="true"]:hover {
+/* .cards-in-hand.your .card[draggable="true"]:hover {
   width: 120px;
   height: 180px;
   transform: translateY(-20px);
   z-index: 1;
-}
+} */
 
 .your {
   background-color: rgb(133, 231, 133);
 }
 
-.your .card {
+/* .your .card {
   background-color: green;
-}
+} */
 
 div[draggable="false"] {
   opacity: 0.5;
