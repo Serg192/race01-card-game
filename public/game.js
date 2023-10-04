@@ -1,15 +1,16 @@
 const yourHand = document.querySelector(".cards-in-hand.your");
 const yourBoardSection = document.querySelector(".board-section.your");
 const opponentBoardSection = document.querySelector(".board-section.opponent");
+const opponentBoardCards = document.querySelectorAll(".board-section.opponent .card");
 const opponentHand = document.querySelector(".cards-in-hand");
 const opponentFace = document.getElementById("opponent_img");
-
+console.log(opponentBoardCards);
 const myTimer = document.getElementById("your_time");
 const opponentTimer = document.getElementById("opponent_time");
 
 yourHand.addEventListener("dragstart", (event) => {
   const target = event.target;
-  if (target.draggable) {
+  if (yourHand.contains(target)) {
     event.dataTransfer.setData("text/plain", target.id);
     target.classList.add("dragging");
   }
@@ -17,16 +18,28 @@ yourHand.addEventListener("dragstart", (event) => {
 
 yourHand.addEventListener("dragend", (event) => {
   const target = event.target;
-  if (target.draggable) {
+  if (yourHand.contains(target)) {
     target.classList.remove("dragging");
   }
 });
 
+yourBoardSection.addEventListener('dragenter', (event) => {
+  event.preventDefault();
+  yourBoardSection.classList.add('dragover-highlight');
+});
+
+
 yourBoardSection.addEventListener("dragover", (event) => {
+  yourBoardSection.classList.add("dragover-highlight");
   event.preventDefault();
 });
 
+yourBoardSection.addEventListener('dragleave', (event) => {
+  yourBoardSection.classList.remove('dragover-highlight');
+});
+
 yourBoardSection.addEventListener("drop", (event) => {
+  yourBoardSection.classList.remove("dragover-highlight");
   event.preventDefault();
   const data = event.dataTransfer.getData("text/plain");
   const draggableElement = document.getElementById(data);
@@ -49,11 +62,49 @@ yourBoardSection.addEventListener("dragend", (event) => {
   draggableElement.classList.remove("dragging");
 });
 
+opponentBoardCards.forEach(card => {
+  card.addEventListener('dragenter', (event) => {
+    event.preventDefault();
+    card.classList.add('dragover-highlight');
+  });
+
+  card.addEventListener("dragover", (event) => {
+    card.classList.add("dragover-highlight");
+    event.preventDefault();
+  });
+  
+  card.addEventListener('dragleave', (event) => {
+    card.classList.remove('dragover-highlight');
+  });
+  
+  card.addEventListener("drop", (event) => {
+    card.classList.remove("dragover-highlight");
+    event.preventDefault();
+    const data = event.dataTransfer.getData("text/plain");
+    const draggableElement = document.getElementById(data);
+  
+    if (card.contains(event.target) && draggableElement) {
+      draggableElement.style.display = "none";
+    }
+  });
+});
+
+opponentFace.addEventListener('dragenter', (event) => {
+  event.preventDefault();
+  opponentFace.classList.add('dragover-highlight');
+});
+
 opponentFace.addEventListener("dragover", (event) => {
+  opponentFace.classList.add("dragover-highlight");
   event.preventDefault();
 });
 
+opponentFace.addEventListener('dragleave', (event) => {
+  opponentFace.classList.remove('dragover-highlight');
+});
+
 opponentFace.addEventListener("drop", (event) => {
+  opponentFace.classList.remove("dragover-highlight");
   event.preventDefault();
   const data = event.dataTransfer.getData("text/plain");
   const draggableElement = document.getElementById(data);

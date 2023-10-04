@@ -21,6 +21,7 @@
               id="opponent_img"
               src="/assets/profile-image/1.png"
               alt="opponent-img"
+              draggable="false"
             />
             <span id="opponent_name">Opponent Name</span>
           </div>
@@ -36,9 +37,55 @@
 
       <div class="board">
         <div class="board-section opponent">
-          <!-- <div class="card"></div>
-          <div class="card"></div>
-          <div class="card"></div> -->
+          <!-- <div class="card tankman" id="lnc5dka3vpeu7tt07e2" data-card-id="28">
+            <img id="card_picture" src="/assets/characters/war-machine.jpg" alt="Card Picture" draggable="false">
+            <span id="card_class_txt">tankman</span>
+            <span id="card_attack_txt">35</span>
+            <span id="card_defence_txt">48</span>
+            <span id="card_health_txt">95</span>
+            <span id="card_usage_price_txt">10</span>
+            <span id="card_name_txt">War Machine</span>
+          </div>
+
+          <div class="card dps" id="lnc5dka4vw48zdw3u6p2" data-card-id="3">
+            <img id="card_picture" src="/assets/characters/captain-america.jpg" alt="Card Picture" draggable="false">
+            <span id="card_class_txt">dps</span>
+            <span id="card_attack_txt">47</span>
+            <span id="card_defence_txt">32</span>
+            <span id="card_health_txt">95</span>
+            <span id="card_usage_price_txt">10</span>
+            <span id="card_name_txt">Captain America</span>
+          </div>
+
+          <div class="card healer" id="lnc5dka4q3nngvhanq2" data-card-id="5">
+            <img id="card_picture" src="/assets/characters/doctor-strange.jpg" alt="Card Picture" draggable="false">
+            <span id="card_class_txt">healer</span>
+            <span id="card_attack_txt">18</span>
+            <span id="card_defence_txt">25</span>
+            <span id="card_health_txt">70</span>
+            <span id="card_usage_price_txt">0</span>
+            <span id="card_name_txt">Doctor Strange</span>
+          </div>
+
+          <div class="card healer" id="lnc5dka52eux0src5bq2" data-card-id="27">
+            <img id="card_picture" src="/assets/characters/wanda-maximoff.jpg" alt="Card Picture" draggable="false">
+            <span id="card_class_txt">healer</span>
+            <span id="card_attack_txt">22</span>
+            <span id="card_defence_txt">44</span>
+            <span id="card_health_txt">65</span>
+            <span id="card_usage_price_txt">0</span>
+            <span id="card_name_txt">Wanda Maximoff</span>
+          </div>
+
+          <div class="card dps" id="lnc5dka5gdv4e693dc2" data-card-id="29">
+            <img id="card_picture" src="/assets/characters/winter-soldier.jpg" alt="Card Picture" draggable="false">
+            <span id="card_class_txt">dps</span>
+            <span id="card_attack_txt">42</span>
+            <span id="card_defence_txt">27</span>
+            <span id="card_health_txt">55</span>
+            <span id="card_usage_price_txt">5</span>
+            <span id="card_name_txt">Winter Soldier</span>
+          </div> -->
         </div>
         <div class="board-section your"></div>
       </div>
@@ -50,6 +97,55 @@
           <div id="card-3" class="card" draggable="true">Card 3</div>
           <div class="card" draggable="false">Card 4</div>
           <div class="card" draggable="false">Card 5</div> -->
+          <!-- <div draggable="true" class="card tankman" id="lnc5dka3vpeu7tt07e" data-card-id="28">
+            <img id="card_picture" src="/assets/characters/war-machine.jpg" alt="Card Picture" draggable="false">
+            <span id="card_class_txt">tankman</span>
+            <span id="card_attack_txt">35</span>
+            <span id="card_defence_txt">48</span>
+            <span id="card_health_txt">95</span>
+            <span id="card_usage_price_txt">10</span>
+            <span id="card_name_txt">War Machine</span>
+          </div>
+
+          <div draggable="true" class="card dps" id="lnc5dka4vw48zdw3u6p" data-card-id="3">
+            <img id="card_picture" src="/assets/characters/captain-america.jpg" alt="Card Picture" draggable="false">
+            <span id="card_class_txt">dps</span>
+            <span id="card_attack_txt">47</span>
+            <span id="card_defence_txt">32</span>
+            <span id="card_health_txt">95</span>
+            <span id="card_usage_price_txt">10</span>
+            <span id="card_name_txt">Captain America</span>
+          </div>
+
+          <div draggable="true" class="card healer" id="lnc5dka4q3nngvhanq" data-card-id="5">
+            <img id="card_picture" src="/assets/characters/doctor-strange.jpg" alt="Card Picture" draggable="false">
+            <span id="card_class_txt">healer</span>
+            <span id="card_attack_txt">18</span>
+            <span id="card_defence_txt">25</span>
+            <span id="card_health_txt">70</span>
+            <span id="card_usage_price_txt">0</span>
+            <span id="card_name_txt">Doctor Strange</span>
+          </div>
+
+          <div draggable="true" class="card healer" id="lnc5dka52eux0src5bq" data-card-id="27">
+            <img id="card_picture" src="/assets/characters/wanda-maximoff.jpg" alt="Card Picture" draggable="false">
+            <span id="card_class_txt">healer</span>
+            <span id="card_attack_txt">22</span>
+            <span id="card_defence_txt">44</span>
+            <span id="card_health_txt">65</span>
+            <span id="card_usage_price_txt">0</span>
+            <span id="card_name_txt">Wanda Maximoff</span>
+          </div>
+
+          <div draggable="true" class="card dps" id="lnc5dka5gdv4e693dc" data-card-id="29">
+            <img id="card_picture" src="/assets/characters/winter-soldier.jpg" alt="Card Picture" draggable="false">
+            <span id="card_class_txt">dps</span>
+            <span id="card_attack_txt">42</span>
+            <span id="card_defence_txt">27</span>
+            <span id="card_health_txt">55</span>
+            <span id="card_usage_price_txt">5</span>
+            <span id="card_name_txt">Winter Soldier</span>
+          </div> -->
         </div>
         <div class="info">
           <div class="user-info">
@@ -57,6 +153,7 @@
               id="your-image"
               src="/assets/profile-image/2.png"
               alt="your-img"
+              draggable="false"
             />
             <!-- <span id="opponent_name">Your Name</span> -->
             <span id="your-name">Your Name</span>

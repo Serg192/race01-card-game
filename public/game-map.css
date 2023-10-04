@@ -168,7 +168,6 @@ body {
   align-items: center;
   /* margin: 10px;
   padding: 15px; */
-  cursor: pointer;
   position: relative;
   /* flex-basis: calc(20% - 50px); */
   /* flex-grow: 1; */
@@ -186,9 +185,9 @@ body {
   background-color: rgb(200, 0, 0, 0.5);
 }
 
-.card:hover {
+/* .card:hover {
   box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
-}
+} */
 
 #card_picture {
   height: 100%;
@@ -281,12 +280,12 @@ body {
   transition: width 0.3s, height 0.3s, transform 0.5s;
 }
 
-/* .cards-in-hand.your .card[draggable="true"]:hover {
+.cards-in-hand.your .card[draggable="true"]:hover {
   width: 120px;
   height: 180px;
   transform: translateY(-20px);
   z-index: 1;
-} */
+}
 
 .your {
   background-color: rgb(133, 231, 133);
@@ -300,21 +299,34 @@ div[draggable="false"] {
   opacity: 0.5;
 }
 
-.board-section.your .card:hover {
+.board-section.your .cards-in-hand {
   transition: width 0.3s, height 0.3s, transform 0.5s;
 }
 
 .board-section.your .card:hover {
   transform: scale(1.1);
   box-shadow: 0 0 10px rgba(255, 255, 0, 0.8);
-  animation: glow 1s infinite alternate;
+  animation: yellow-glow 1s infinite alternate;
 }
 
-@keyframes glow {
+@keyframes yellow-glow {
   0% {
     box-shadow: 0 0 10px rgba(255, 255, 0, 0.8);
   }
   100% {
-    box-shadow: 0 0 50px rgba(255, 255, 0, 0.8);
+    box-shadow: 0 0 50px rgba(255, 255, 0, 1.0);
+  }
+}
+
+.dragover-highlight {
+  animation: red-glow 1s infinite alternate;
+}
+
+@keyframes red-glow {
+  0% {
+    box-shadow: 0 0 10px rgba(0, 42, 255, 0.8);
+  }
+  100% {
+    box-shadow: 0 0 50px rgb(0, 68, 255);
   }
 }
