@@ -42,7 +42,38 @@
             </div>
             <div id="rules" class="rules">
                 <h2>Rules</h2>
-                <p>This is the rules section.</p>
+                <p class="intro-text">Firstly, let's go through the cards!</p>
+                <div id="rule-cards" class="rule-container">
+                  <img src="assets/screenshots/card-dps.png" alt="Card dps"/>
+                  <img src="assets/screenshots/card-tankman.png" alt="Card tankman"/>
+                  <img src="assets/screenshots/card-healer.png" alt="Card healer"/>
+                  <p class="description-text">
+                    Each card displays a certain character with a specific set of characteristics.<br /><br/><br />
+                    You may have noticed that the cards are different in color, so there are three types of characters:<br /><br />
+                    &emsp;<span id="dps">dps</span> (damage per second) - has the highest attack, but lower defence;<br /><br/>
+                    &emsp;<span id="tankman">tankman</span> - has lower attack, but higher defence;<br /><br/>
+                    &emsp;<span id="healer">healer</span> - has the lowest attack, but usually higher defence and health.
+                  </p>
+                </div>
+                <p class="intro-text">Next step is to explore cards in detail...</p>
+                <div id="rule-cards-top" class="rule-container">
+                  <img src="assets/screenshots/card-top.png" alt="Card top"/>
+                  <p class="description-text">
+                    On the top of the card, you can find next values:<br /><br/>
+                    &nbsp;&emsp;<span id="usage-price" class="circle">15</span> - usage price (least number of gained points to use a card);<br /><br/>
+                    &emsp;<span id="price"  class="circle">150</span> - price (number of coins to buy a card), that's shown only at <span id="store-text">Store</span> section.
+                  </p>
+                </div>
+                <div id="rule-cards-bottom" class="rule-container">
+                  <img src="assets/screenshots/card-bottom.png" alt="Card bottom"/>
+                  <p class="description-text">
+                    On the bottom of the card, you can find next values:<br /><br/>
+                    &nbsp;&emsp;<span id="name">Spider Man</span> - name;<br /><br/>
+                    &nbsp;&emsp;<span id="attack" class="circle">50</span> - attack (the possible amount of damage dealt to an opponent's card);<br /><br/>
+                    &emsp;<span id="health" class="circle">100</span> - health (hp of the card);<br /><br/>
+                    &nbsp;&emsp;<span id="defence" class="circle">36</span> - defence (the protection amount of the card);
+                  </p>
+                </div>
             </div>
             <div id="profile" class="profile">
                 <h2>Profile Detail</h2>
@@ -53,7 +84,7 @@
                 <p>You won <span id="wins_number_txt"></span> time(s)!</p>
                 <p>You lost <span id="losses_number_txt"></span> time(s)!</p>
                 <a href="#log_out">
-                    <button onclick="onLogout(event)">Log Out</button>
+                  <button onclick="onLogout(event)">Log Out</button>
                 </a>
             </div>        
         </div>
@@ -193,7 +224,17 @@
       });
       storeItems.send();
 
-      
+      let buyCardReq = new XMLHttpRequest();
+      buyCardReq.open("POST", "/game-api/buy-card", true);
+      buyCardReq.addEventListener("load", () => {
+        if (buyCardReq.status == 200) {
+          console.log("Card purchased successfully!");
+        } else {
+          console.error("Error purchasing card.");
+        }
+      });
+
+
       function handleCardClick(card) {
         const cardNameElement = card.querySelector("#card_name_txt");
         const cardName = cardNameElement.textContent;
