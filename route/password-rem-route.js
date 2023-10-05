@@ -2,6 +2,7 @@ const nodemailer = require("nodemailer");
 const path = require("path");
 const express = require("express");
 const router = express.Router();
+const bcrypt = require("bcrypt");
 
 const User = require("../models/user");
 const props = require("../properties");
@@ -17,7 +18,11 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-function createMailOptions(to, password) {
+function genCode() {
+  return Date.now().toString(36) + Math.random().toString(36).substr(2);
+};
+
+function createMailOptions(to, confirmCode) {
   return {
     from: {
       name: "Password reminder",
@@ -26,11 +31,9 @@ function createMailOptions(to, password) {
     to: to,
     subject: "Your password",
     html: `<h1>Hi</h1>
-            <p>I store encrypted with bcrypt passwords in my database for safety reasons,</p>
-            <p>and there is no straightforward way to send you the raw password.</p>
-            <p>However, here is its hash: <b>${password}</b>.</p>
-            <p>This is the only information I can provide.</p>
-            <p>In real life, I could offer you the option to reset it, but the task dictates that I must send password to you.</p>
+            <p>You received this letter because you want to reset your password.</p>
+            <p>Here is the confirmation code: <b>${confirmCode}</b></p>
+            <p>Do not show it to anyone and complete the password reset operation as soon as possible..</p>
     `,
   };
 }
@@ -43,14 +46,66 @@ router.post("/", async (req, res) => {
     });
   } else {
     try {
+      const confirmCode = genCode();
+      const user = new User({
+        id: rows[0].id,
+        userLogin: rows[0].user_login,
+        userPassword: rows[0].user_password,
+        userFullName: rows[0].user_full_name,
+        userEmail: rows[0].user_email,
+        userConfirmCode: confirmCode,
+      });
+      user.save();
+
       await transporter.sendMail(
-        createMailOptions(req.body.email, rows[0].user_password)
+        createMailOptions(req.body.email, confirmCode)
       );
       res.status(200).send();
     } catch (err) {
       console.error(err);
       res.status(500).json({
         message: "An error occurred while trying to send email",
+      });
+    }
+  }
+});
+
+router.post("/reset-password", async (req, res) => {
+  const rows = await new User().findByConfirmCode(req.body.confirmation);
+  const newPass = req.body.newPass;
+  const confirmPass = req.body.confirmPass;
+
+  if (rows.length == 0) {
+    res.status(404).json({
+      message: "Verification code is incorrect",
+    });
+  } else if (newPass !== confirmPass) {
+    res.status(404).json({
+      message: "Passwords don't match",
+    });
+  } else if (newPass.length < props.MIN_PASSWORD_LEN) {
+    res.status(404).json({
+      message: `Password should have at least ${props.MIN_PASSWORD_LEN} characters!`,
+    });
+  } 
+  else {
+    try {
+
+      const user = new User({
+        id: rows[0].id,
+        userLogin: rows[0].user_login,
+        userPassword: await bcrypt.hash(newPass, 10),
+        userFullName: rows[0].user_full_name,
+        userEmail: rows[0].user_email,
+        userConfirmCode: null,
+      });
+      user.save();
+
+      res.status(200).send();
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({
+        message: "Reset password error",
       });
     }
   }

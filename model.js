@@ -54,7 +54,7 @@ class Model {
   }
 
   async update(data, idname = "id") {
-    return await super.execute(
+    return await this.execute(
       `UPDATE ${this.tableName} SET ? WHERE ${idname} = ?`,
       data
     );
