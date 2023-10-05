@@ -359,7 +359,21 @@ function displayGameResult(text) {
   searchBox.style.display = "none";
   gameContainer.style.display = "none";
   resultText.textContent = text;
+
   resultsDiv.style.display = "block";
+
+  if (text === "You won") {
+    document.body.style.backgroundImage = "url('/assets/victory.jpg')";
+  } else if (text === "You lost") {
+    document.body.style.backgroundImage = "url('/assets/loose.jpg')";
+  } else if (text === "You have been disconnected from game session" || text === "Opponent left this game") {
+    document.body.style.backgroundImage = "url('/assets/disconnect.jpg')";
+  }
+
+  document.body.style.backgroundSize = "cover";
+  document.body.style.backgroundRepeat = "no-repeat";
+  document.body.style.backgroundAttachment = "fixed";
+  document.body.style.backdropFilter = "blur(4px)";
 }
 
 function loadPlayerCards(count, clear = true) {
