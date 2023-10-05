@@ -16,6 +16,8 @@ const resultsDiv = document.getElementById("results");
 const resultText = document.getElementById("game-results");
 const gameContainer = document.getElementById("game-container");
 
+const searchBox = document.getElementById("game-search");
+
 let socket = io(),
   login,
   playerImg,
@@ -24,10 +26,6 @@ let socket = io(),
 
 let myMove;
 let myCards = [];
-
-// window.onbeforeunload = function () {
-//   return "Are you sure you want to leave this page?";
-// };
 
 yourHand.addEventListener("dragstart", (event) => {
   const target = event.target;
@@ -137,12 +135,6 @@ opponentBoardSection.addEventListener("drop", (event) => {
     const relativeX = dropX - containerRect.left;
     const relativeY = dropY;
 
-    console.log(
-      "Dropped card position (relative to container):",
-      relativeX,
-      relativeY
-    );
-
     const opponentCards = opponentBoardSection.querySelectorAll(".card");
     opponentCards.forEach((opponentCard) => {
       const opponentCardRect = opponentCard.getBoundingClientRect();
@@ -195,6 +187,7 @@ function togglePlayerTurn() {
 }
 
 function onBackToLobby(event) {
+  localStorage.setItem("gameRunning", false);
   socket.emit("stop-search-room", { login: login });
   window.location.href = "/lobby";
 }
@@ -219,13 +212,20 @@ req.send();
 
 function start() {
   const gameRunning = localStorage.getItem("gameRunning");
-  if (gameRunning == null || gameRunning == false) {
+  console.log(gameRunning);
+  if (gameRunning == null || gameRunning === "false") {
     socket.emit("search-room", { login: login });
   } else {
     //roomName = localStorage.getItem("room");
     //HANDLE PAGE RELOAD
     //TEMPORARY
-    socket.emit("search-room", { login: login });
+    //socket.emit("search-room", { login: login });
+
+    //
+    console.log("HERE");
+    console.log("Room: " + localStorage.getItem("room"));
+    displayGameResult("You have been disconnected from game session");
+    socket.emit("disconnected", { room: localStorage.getItem("room") });
   }
 }
 
@@ -236,6 +236,7 @@ socket.on("connect_error", function (err) {
 socket.on("room-found", (data) => {
   roomName = `${data.first} room`;
   localStorage.setItem("gameRunning", true);
+  localStorage.setItem("room", roomName);
   yourMP.textContent = 10;
 
   myMove = data.first === login;
@@ -248,7 +249,6 @@ socket.on("room-found", (data) => {
     button.setAttribute("disabled", true);
   }
 
-  const searchBox = document.getElementById("game-search");
   const gameDiv = document.getElementById("game-container");
 
   searchBox.style.display = "none";
@@ -264,6 +264,10 @@ socket.on("opponent-picture", (data) => {
   opponentFace.src = `/assets/profile-image/${data.picture}`;
   loadStartCards();
   setOpponentDefaultCards();
+});
+
+socket.on("opponent-left-room", (data) => {
+  displayGameResult("Opponent left this game");
 });
 
 socket.on("opponent-dropped-a-card", (data) => {
@@ -287,7 +291,6 @@ socket.on("opponent-dropped-a-card", (data) => {
       cardElement.addEventListener("click", () => {
         handleCardClick(cardElement);
       });
-      console.log(cardElement);
       opponentBoardSection.appendChild(cardElement);
       opponentHand.removeChild(opponentHand.firstChild);
     }
@@ -310,8 +313,6 @@ socket.on("opponent-timer", (data) => {
 
 socket.on("opponent-attaks-my-card", (data) => {
   const { opCardId, opHP, myCardId, myNewHP } = data;
-
-  console.log(opCardId, opHP);
 
   const opponentCardDiv = Array.from(opponentBoardSection.children).filter(
     (card) => card.id == opCardId
@@ -355,6 +356,7 @@ socket.on("you-won", (data) => {
 });
 
 function displayGameResult(text) {
+  searchBox.style.display = "none";
   gameContainer.style.display = "none";
   resultText.textContent = text;
   resultsDiv.style.display = "block";
@@ -386,7 +388,6 @@ function loadPlayerCards(count, clear = true) {
         });
         yourHand.appendChild(cardElement);
         if (myMove) markExpensiveCards();
-        // myCards.push(cardElement);
       });
     }
   });

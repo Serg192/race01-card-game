@@ -71,6 +71,10 @@ function initSocket(server) {
       onUserDefeted(data.loser);
       socket.broadcast.to(data.room).emit("you-won");
     });
+
+    socket.on("disconnected", (data) => {
+      onPlayerLeave(io, socket, data);
+    });
   });
 
   return io;
@@ -159,6 +163,17 @@ async function onUserDefeted(username) {
     details.user_id = userID;
     details.setLosses(parseInt(losses) + 1);
   }
+}
+
+function onPlayerLeave(io, socket, data) {
+  const roomName = data.room;
+  socket.broadcast.to(roomName).emit("opponent-left-room");
+
+  io.of("/").adapter.rooms[roomName]?.forEach((socketId) => {
+    io.of("/").sockets[socketId].leave(roomName);
+  });
+
+  io.of("/").adapter.rooms[roomName] = null;
 }
 
 module.exports = { initSocket };
