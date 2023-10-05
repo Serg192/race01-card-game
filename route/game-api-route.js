@@ -45,7 +45,8 @@ router.get("/player-rand-card", async (req, res) => {
 
 router.post("/buy-card", async (req, res) => {
   const userID = jwt.decode(req.cookies.token).id;
-  const cardID = req.body.iteamID;
+
+  const cardID = req.query.id;
 
   const validationResult = await validateCardPurchase(userID, cardID);
 

@@ -93,9 +93,14 @@ async function validateCardPurchase(userID, cardID) {
     }
   }
 
+  if (cardID <= 0 || cardID > props.CARD_COUNT) {
+    return makeValidationResult(false, "Card id is wrong!");
+  }
   const userCoins = parseInt(
     (await accountDetails.findBy("user_id", userID))[0].user_coins
   );
+
+  const test = await cards.findBy("id", cardID);
 
   const cardPrice = parseInt((await cards.findBy("id", cardID))[0].card_price);
   if (userCoins < cardPrice) {

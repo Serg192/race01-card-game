@@ -169,6 +169,7 @@
 
       function createCardHTML(card) {
         const {
+          id,
           card_name,
           card_class,
           card_attack,
@@ -186,7 +187,8 @@
           <span id="card_health_txt">${card_health}</span>
           <span id="card_usage_price_txt">${card_usage_price}</span>
           <span id="card_price_txt">${card_price}</span>
-          <span id="card_name_txt">${card_name}</span>`;
+          <span id="card_name_txt">${card_name}</span>
+          <span id="card_id" style="display: none">${id}</span>`;
       }
 
       const cardContainer = document.getElementById("card_container");
@@ -242,16 +244,6 @@
       });
       storeItems.send();
 
-      let buyCardReq = new XMLHttpRequest();
-      buyCardReq.open("POST", "/game-api/buy-card", true);
-      buyCardReq.addEventListener("load", () => {
-        if (buyCardReq.status == 200) {
-          console.log("Card purchased successfully!");
-        } else {
-          console.error("Error purchasing card.");
-        }
-      });
-
 
       function handleCardClick(card) {
         const cardNameElement = card.querySelector("#card_name_txt");
@@ -261,7 +253,22 @@
         buyModal.style.display = "block";
 
         const buyButton = document.getElementById("buyButton");
-        buyButton.addEventListener("click", () => {
+        buyButton.addEventListener("click", (ev) => {
+          ev.preventDefault();
+          const cardID = card.querySelector("#card_id").textContent;
+          let buyRequest = new XMLHttpRequest();
+          buyRequest.open("POST", `/game-api/buy-card?id=${cardID}`, true);
+          buyRequest.addEventListener("load", () => {
+            if(buyRequest.status != 200) {
+              const resJSON = JSON.parse(buyRequest.responseText);
+              alert(resJSON.message);
+            } else {
+              alert("Success");
+              location.reload();
+            }
+          });
+          buyRequest.send();
+          buyModal.style.display = "none";
         });
 
         const closeButton = document.querySelector(".close");

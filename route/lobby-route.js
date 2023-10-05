@@ -16,7 +16,7 @@ router.post("/logout", (req, res) => {
 });
 
 router.get("/", (req, res) => {
-    res.sendFile(path.join(__dirname, "../views", "lobby.html"));
+  res.sendFile(path.join(__dirname, "../views", "lobby.html"));
 });
 
 module.exports = router;

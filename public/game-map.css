@@ -318,3 +318,32 @@ div[draggable="false"] {
     box-shadow: 0 0 50px rgba(255, 255, 0, 0.8);
   }
 }
+
+.results {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  padding: 20px;
+  border: 1px solid #ccc;
+}
+
+#game-results {
+  font-size: 24px;
+  margin-bottom: 20px;
+}
+
+#results button {
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  font-size: 16px;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+#results button:hover {
+  background-color: #0056b3;
+}

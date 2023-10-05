@@ -12,6 +12,10 @@ const yourHP = document.getElementById("your_hp");
 
 const opponentHP = document.getElementById("opponent_hp");
 
+const resultsDiv = document.getElementById("results");
+const resultText = document.getElementById("game-results");
+const gameContainer = document.getElementById("game-container");
+
 let socket = io(),
   login,
   playerImg,
@@ -20,6 +24,10 @@ let socket = io(),
 
 let myMove;
 let myCards = [];
+
+// window.onbeforeunload = function () {
+//   return "Are you sure you want to leave this page?";
+// };
 
 yourHand.addEventListener("dragstart", (event) => {
   const target = event.target;
@@ -187,6 +195,7 @@ function togglePlayerTurn() {
 }
 
 function onBackToLobby(event) {
+  socket.emit("stop-search-room", { login: login });
   window.location.href = "/lobby";
 }
 
@@ -226,7 +235,6 @@ socket.on("connect_error", function (err) {
 
 socket.on("room-found", (data) => {
   roomName = `${data.first} room`;
-  //localStorage.setItem("room", room);
   localStorage.setItem("gameRunning", true);
   yourMP.textContent = 10;
 
@@ -329,18 +337,28 @@ socket.on("opponent-attaks-my-card", (data) => {
 });
 
 socket.on("opponent-attacks-me", (data) => {
-  console.log("AUCH");
   const newUserHP = parseInt(yourHP.textContent) - data.points;
   yourHP.textContent = newUserHP;
 
   if (newUserHP <= 0) {
-    socket.emit("you-won", { room: roomName });
+    socket.emit("you-won", {
+      room: roomName,
+      winner: document.getElementById("opponent_name").textContent,
+      loser: login,
+    });
+    displayGameResult("You lost");
   }
 });
 
 socket.on("you-won", (data) => {
-  console.log("WIN");
+  displayGameResult("You won");
 });
+
+function displayGameResult(text) {
+  gameContainer.style.display = "none";
+  resultText.textContent = text;
+  resultsDiv.style.display = "block";
+}
 
 function loadPlayerCards(count, clear = true) {
   let req = new XMLHttpRequest();

@@ -2,6 +2,9 @@ const { Server } = require("socket.io");
 const props = require("./properties");
 const jwt = require("jsonwebtoken");
 
+const User = require("./models/user");
+const AccountDetails = require("./models/account-details");
+
 function parseCookies(cookies) {
   const c = {};
   cookies.split(";").forEach((cookie) => {
@@ -64,6 +67,8 @@ function initSocket(server) {
     });
 
     socket.on("you-won", (data) => {
+      onUserWon(data.winner);
+      onUserDefeted(data.loser);
       socket.broadcast.to(data.room).emit("you-won");
     });
   });
@@ -126,6 +131,34 @@ function onCardUserAttack(io, socket, data) {
   socket.broadcast.to(data.room).emit("opponent-attacks-me", {
     points: data.points,
   });
+}
+
+async function onUserWon(username) {
+  const user = new User();
+  const userID = (await user.findByLogin(username))[0].id;
+
+  if (userID != undefined) {
+    const details = new AccountDetails();
+    const accountDetails = (await details.findBy("user_id", userID))[0];
+    const coins = accountDetails.user_coins;
+    const wins = accountDetails.user_wins;
+    details.user_id = userID;
+    details.setCoins(parseInt(coins) + Math.floor(Math.random() * 10) + 1);
+    details.setWins(parseInt(wins) + 1);
+  }
+}
+
+async function onUserDefeted(username) {
+  const user = new User();
+  const userID = (await user.findByLogin(username))[0].id;
+
+  if (userID != undefined) {
+    const details = new AccountDetails();
+    const accountDetails = (await details.findBy("user_id", userID))[0];
+    const losses = accountDetails.user_losses;
+    details.user_id = userID;
+    details.setLosses(parseInt(losses) + 1);
+  }
 }
 
 module.exports = { initSocket };
