@@ -7,6 +7,15 @@ const opponentFace = document.getElementById("opponent_img");
 const myTimer = document.getElementById("your_time");
 const opponentTimer = document.getElementById("opponent_time");
 
+let socket = io(),
+  login,
+  playerImg,
+  roomName,
+  timer;
+
+let myMove;
+let myCards = [];
+
 yourHand.addEventListener("dragstart", (event) => {
   const target = event.target;
   if (target.draggable) {
@@ -32,9 +41,14 @@ yourBoardSection.addEventListener("drop", (event) => {
   const draggableElement = document.getElementById(data);
 
   if (yourBoardSection.contains(event.target) && draggableElement) {
+    yourHand.removeChild(draggableElement);
     yourBoardSection.appendChild(draggableElement);
     const droppedCardId = draggableElement.dataset.cardId;
-    socket.emit("card-dropped", { room: roomName, cardID: droppedCardId });
+    socket.emit("card-dropped", {
+      room: roomName,
+      cardID: droppedCardId,
+      localCardId: draggableElement.id,
+    });
   }
 });
 
@@ -63,6 +77,54 @@ opponentFace.addEventListener("drop", (event) => {
   }
 });
 
+opponentBoardSection.addEventListener("dragover", (event) => {
+  event.preventDefault();
+});
+
+function rectanglesIntersect(position, rect) {
+  return (
+    position.x > rect.left &&
+    position.x < rect.right &&
+    position.y < rect.bottom &&
+    position.y > rect.top
+  );
+}
+
+opponentBoardSection.addEventListener("drop", (event) => {
+  event.preventDefault();
+  const data = event.dataTransfer.getData("text/plain");
+  const draggableElement = document.getElementById(data);
+
+  if (draggableElement) {
+    const dropX = event.clientX;
+    const dropY = event.clientY;
+
+    const containerRect = opponentBoardSection.getBoundingClientRect();
+    const relativeX = dropX - containerRect.left;
+    const relativeY = dropY;
+
+    console.log(
+      "Dropped card position (relative to container):",
+      relativeX,
+      relativeY
+    );
+
+    const opponentCards = opponentBoardSection.querySelectorAll(".card");
+    opponentCards.forEach((opponentCard) => {
+      const opponentCardRect = opponentCard.getBoundingClientRect();
+
+      if (
+        rectanglesIntersect({ x: relativeX, y: relativeY }, opponentCardRect)
+      ) {
+        handleAttack(draggableElement, opponentCard);
+      }
+    });
+
+    opponentBoardSection.classList.remove("highlight");
+    yourBoardSection.appendChild(draggableElement);
+  }
+});
+
 // player-turn
 const button = document.getElementById("turn-button");
 button.addEventListener("click", togglePlayerTurn);
@@ -84,8 +146,16 @@ function togglePlayerTurn() {
   }
 
   myMove = !myMove;
-  myCards.forEach((div) => {
-    div.draggable = myMove;
+  // myCards.forEach((div) => {
+  //   div.draggable = myMove;
+  // });
+
+  Array.from(yourBoardSection.children).forEach((card) => {
+    card.draggable = myMove;
+  });
+
+  Array.from(yourHand.children).forEach((card) => {
+    card.draggable = myMove;
   });
 }
 
@@ -95,37 +165,32 @@ function onBackToLobby(event) {
 
 //////////////////////////////////////////
 
-let socket = io(),
-  login,
-  playerImg,
-  roomName,
-  timer;
-
-let myMove;
-let myCards = [];
-
 let req = new XMLHttpRequest();
-req.open("GET", `/game-api/account-info`, false);
+req.open("GET", `/game-api/account-info`, true);
+req.addEventListener("load", () => {
+  if (req.status == 200) {
+    const resJSON = JSON.parse(req.responseText);
+    login = resJSON[0].user_login;
+    playerImg = resJSON[0].user_picture;
+    document.getElementById("your-name").innerText = login;
+    document.getElementById(
+      "your-image"
+    ).src = `/assets/profile-image/${playerImg}`;
+    start();
+  }
+});
 req.send();
 
-if (req.status == 200) {
-  const resJSON = JSON.parse(req.responseText);
-  login = resJSON[0].user_login;
-  playerImg = resJSON[0].user_picture;
-  document.getElementById("your-name").innerText = login;
-  document.getElementById(
-    "your-image"
-  ).src = `/assets/profile-image/${playerImg}`;
-}
-
-const gameRunning = localStorage.getItem("gameRunning");
-if (gameRunning == null || gameRunning == false) {
-  socket.emit("search-room", { login: login });
-} else {
-  roomName = localStorage.getItem("room");
-  //HANDLE PAGE RELOAD
-  //TEMPORARY
-  socket.emit("search-room", { login: login });
+function start() {
+  const gameRunning = localStorage.getItem("gameRunning");
+  if (gameRunning == null || gameRunning == false) {
+    socket.emit("search-room", { login: login });
+  } else {
+    //roomName = localStorage.getItem("room");
+    //HANDLE PAGE RELOAD
+    //TEMPORARY
+    socket.emit("search-room", { login: login });
+  }
 }
 
 socket.on("connect_error", function (err) {
@@ -133,8 +198,8 @@ socket.on("connect_error", function (err) {
 });
 
 socket.on("room-found", (data) => {
-  room = `${data.first} room`;
-  localStorage.setItem("room", room);
+  roomName = `${data.first} room`;
+  //localStorage.setItem("room", room);
   localStorage.setItem("gameRunning", true);
 
   myMove = data.first === login;
@@ -156,7 +221,7 @@ socket.on("room-found", (data) => {
   document.getElementById("opponent_name").innerText =
     data.first === login ? data.second : data.first;
 
-  socket.emit("my-picture", { room: room, picture: playerImg });
+  socket.emit("my-picture", { room: roomName, picture: playerImg });
 });
 
 socket.on("opponent-picture", (data) => {
@@ -181,7 +246,7 @@ socket.on("opponent-dropped-a-card", (data) => {
         cardElement.className = "card dps";
       }
       cardElement.innerHTML = createCardHTML(card);
-      cardElement.id = `${uid()}`;
+      cardElement.id = `${data.localCardId}`;
       cardElement.setAttribute("data-card-id", card.id);
       cardElement.addEventListener("click", () => {
         handleCardClick(cardElement);
@@ -204,6 +269,34 @@ socket.on("my-turn", (data) => {
 
 socket.on("opponent-timer", (data) => {
   opponentTimer.innerText = `00:${String(data.sec).padStart(2, "0")}`;
+});
+
+socket.on("opponent-attaks-my-card", (data) => {
+  const { opCardId, opHP, myCardId, myNewHP } = data;
+
+  console.log(opCardId, opHP);
+
+  const opponentCardDiv = Array.from(opponentBoardSection.children).filter(
+    (card) => card.id == opCardId
+  )[0];
+
+  const myCardDiv = Array.from(yourBoardSection.children).filter(
+    (card) => card.id == myCardId
+  )[0];
+
+  if (opHP <= 0) {
+    opponentBoardSection.removeChild(opponentCardDiv);
+  } else {
+    const opHpSpan = opponentCardDiv.querySelector("#card_health_txt");
+    opHpSpan.textContent = `${opHP}`;
+  }
+
+  if (myNewHP <= 0) {
+    yourBoardSection.removeChild(myCardDiv);
+  } else {
+    const myHpSpan = myCardDiv.querySelector("#card_health_txt");
+    myHpSpan.textContent = `${myNewHP}`;
+  }
 });
 
 function loadPlayerCards(count, clear = true) {
@@ -231,7 +324,7 @@ function loadPlayerCards(count, clear = true) {
           handleCardClick(cardElement);
         });
         yourHand.appendChild(cardElement);
-        myCards.push(cardElement);
+        // myCards.push(cardElement);
       });
     }
   });
@@ -268,6 +361,52 @@ function startTimer() {
       socket.emit("my-timer", { room: roomName, sec: sec });
     }
   }, 1000);
+}
+
+function handleAttack(myCard, opponentCard) {
+  const myAttack = parseInt(
+    myCard.querySelector("#card_attack_txt").textContent
+  );
+  const opponentDefence = parseInt(
+    opponentCard.querySelector("#card_defence_txt").textContent
+  );
+
+  const myLocalID = myCard.id;
+  const opponentLocalId = opponentCard.id;
+
+  console.log("My Attack: " + myAttack);
+  console.log("Opponent defence: " + opponentDefence);
+
+  const myHpSpan = myCard.querySelector("#card_health_txt");
+  const opponentHpSpan = opponentCard.querySelector("#card_health_txt");
+
+  const myHP = parseInt(myHpSpan.textContent);
+  console.log("My HP: " + myHP);
+  const opponentHP = parseInt(opponentHpSpan.textContent);
+  console.log("Opponent HP: " + opponentHP);
+
+  const myNewHP = myHP - opponentDefence;
+  const opponentNewHP = opponentHP - myAttack;
+
+  if (opponentNewHP <= 0) {
+    opponentBoardSection.removeChild(opponentCard);
+  } else {
+    opponentHpSpan.textContent = `${opponentNewHP}`;
+  }
+
+  if (myNewHP <= 0) {
+    yourBoardSection.removeChild(myCard);
+  } else {
+    myHpSpan.textContent = `${myNewHP}`;
+  }
+
+  socket.emit("card-card-attack", {
+    room: roomName,
+    opCardId: myLocalID,
+    opHP: myNewHP,
+    myCardId: opponentLocalId,
+    myNewHP: opponentNewHP,
+  });
 }
 
 function createCardHTML(card) {

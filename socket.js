@@ -54,6 +54,10 @@ function initSocket(server) {
     socket.on("my-timer", (data) => {
       onTimer(io, socket, data);
     });
+
+    socket.on("card-card-attack", (data) => {
+      onCardCardAttack(io, socket, data);
+    });
   });
 
   return io;
@@ -87,9 +91,10 @@ function onOpponentImage(io, socket, data) {
 }
 
 function onCardDropped(io, socket, data) {
-  socket.broadcast
-    .to(data.room)
-    .emit("opponent-dropped-a-card", { cardID: data.cardID });
+  socket.broadcast.to(data.room).emit("opponent-dropped-a-card", {
+    cardID: data.cardID,
+    localCardId: data.localCardId,
+  });
 }
 
 function onNextTurn(io, socket, data) {
@@ -98,6 +103,15 @@ function onNextTurn(io, socket, data) {
 
 function onTimer(io, socket, data) {
   socket.broadcast.to(data.room).emit("opponent-timer", { sec: data.sec });
+}
+
+function onCardCardAttack(io, socket, data) {
+  socket.broadcast.to(data.room).emit("opponent-attaks-my-card", {
+    opCardId: data.opCardId,
+    opHP: data.opHP,
+    myCardId: data.myCardId,
+    myNewHP: data.myNewHP,
+  });
 }
 
 module.exports = { initSocket };
