@@ -11,6 +11,7 @@ CREATE TABLE IF NOT EXISTS users (
     user_full_name VARCHAR(50) NOT NULL,
     user_email VARCHAR(35) UNIQUE NOT NULL,
     user_role ENUM('admin', 'user') DEFAULT 'user',
+    user_confirmation_code VARCHAR(35),
     PRIMARY KEY(id)
 );
 

@@ -11,6 +11,7 @@ class User extends Model {
     userFullName = null,
     userEmail = null,
     userPassword = null,
+    userConfirmCode = null,
   } = {}) {
     super("users");
     this.id = id;
@@ -18,6 +19,7 @@ class User extends Model {
     this.userPassword = userPassword;
     this.userFullName = userFullName;
     this.userEmail = userEmail;
+    this.userConfirmCode = userConfirmCode;
   }
 
   async findByLogin(login) {
@@ -28,6 +30,10 @@ class User extends Model {
     return await super.findBy("user_email", email);
   }
 
+  async findByConfirmCode(confirmCode) {
+    return await super.findBy("user_confirmation_code", confirmCode);
+  }
+
   async save() {
     let userData = {
       id: this.id,
@@ -35,6 +41,7 @@ class User extends Model {
       user_password: this.userPassword,
       user_full_name: this.userFullName,
       user_email: this.userEmail,
+      user_confirmation_code: this.userConfirmCode,
     };
 
     let result = null;
