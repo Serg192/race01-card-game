@@ -7,6 +7,11 @@ const opponentFace = document.getElementById("opponent_img");
 const myTimer = document.getElementById("your_time");
 const opponentTimer = document.getElementById("opponent_time");
 
+const yourMP = document.getElementById("your_mp");
+const yourHP = document.getElementById("your_hp");
+
+const opponentHP = document.getElementById("opponent_hp");
+
 let socket = io(),
   login,
   playerImg,
@@ -41,14 +46,23 @@ yourBoardSection.addEventListener("drop", (event) => {
   const draggableElement = document.getElementById(data);
 
   if (yourBoardSection.contains(event.target) && draggableElement) {
-    yourHand.removeChild(draggableElement);
-    yourBoardSection.appendChild(draggableElement);
-    const droppedCardId = draggableElement.dataset.cardId;
-    socket.emit("card-dropped", {
-      room: roomName,
-      cardID: droppedCardId,
-      localCardId: draggableElement.id,
+    let alreadyPresent = false;
+    Array.from(yourBoardSection.children).forEach((card) => {
+      if (card.id == draggableElement.id) alreadyPresent = true;
     });
+
+    if (!alreadyPresent) {
+      yourBoardSection.appendChild(draggableElement);
+      draggableElement.draggable = false;
+      handleMP(draggableElement);
+      markExpensiveCards();
+      const droppedCardId = draggableElement.dataset.cardId;
+      socket.emit("card-dropped", {
+        room: roomName,
+        cardID: droppedCardId,
+        localCardId: draggableElement.id,
+      });
+    }
   }
 });
 
@@ -73,7 +87,19 @@ opponentFace.addEventListener("drop", (event) => {
   const draggableElement = document.getElementById(data);
 
   if (opponentFace.contains(event.target) && draggableElement) {
-    draggableElement.style.display = "none";
+    if (opponentBoardSection.childElementCount == 0) {
+      const cardAttack = parseInt(
+        draggableElement.querySelector("#card_attack_txt").textContent
+      );
+
+      opponentHP.textContent = `${
+        parseInt(opponentHP.textContent) - cardAttack
+      }`;
+      socket.emit("card-user-attack", { room: roomName, points: cardAttack });
+      draggableElement.draggable = false;
+    } else {
+      alert("You should defeat your opponents' cards first!");
+    }
   }
 });
 
@@ -146,17 +172,18 @@ function togglePlayerTurn() {
   }
 
   myMove = !myMove;
-  // myCards.forEach((div) => {
-  //   div.draggable = myMove;
-  // });
 
   Array.from(yourBoardSection.children).forEach((card) => {
     card.draggable = myMove;
   });
 
-  Array.from(yourHand.children).forEach((card) => {
-    card.draggable = myMove;
-  });
+  if (myMove) {
+    markExpensiveCards();
+  } else {
+    Array.from(yourHand.children).forEach((card) => {
+      card.draggable = false;
+    });
+  }
 }
 
 function onBackToLobby(event) {
@@ -201,6 +228,7 @@ socket.on("room-found", (data) => {
   roomName = `${data.first} room`;
   //localStorage.setItem("room", room);
   localStorage.setItem("gameRunning", true);
+  yourMP.textContent = 10;
 
   myMove = data.first === login;
   if (myMove) {
@@ -265,6 +293,7 @@ socket.on("my-turn", (data) => {
     fetchOneCard();
   }
   startTimer();
+  yourMP.textContent = parseInt(yourMP.textContent) + 2;
 });
 
 socket.on("opponent-timer", (data) => {
@@ -299,6 +328,20 @@ socket.on("opponent-attaks-my-card", (data) => {
   }
 });
 
+socket.on("opponent-attacks-me", (data) => {
+  console.log("AUCH");
+  const newUserHP = parseInt(yourHP.textContent) - data.points;
+  yourHP.textContent = newUserHP;
+
+  if (newUserHP <= 0) {
+    socket.emit("you-won", { room: roomName });
+  }
+});
+
+socket.on("you-won", (data) => {
+  console.log("WIN");
+});
+
 function loadPlayerCards(count, clear = true) {
   let req = new XMLHttpRequest();
   req.open("GET", `/game-api/player-rand-card?count=${count}`, true);
@@ -324,6 +367,7 @@ function loadPlayerCards(count, clear = true) {
           handleCardClick(cardElement);
         });
         yourHand.appendChild(cardElement);
+        if (myMove) markExpensiveCards();
         // myCards.push(cardElement);
       });
     }
@@ -364,6 +408,7 @@ function startTimer() {
 }
 
 function handleAttack(myCard, opponentCard) {
+  console.log(myCard);
   const myAttack = parseInt(
     myCard.querySelector("#card_attack_txt").textContent
   );
@@ -374,16 +419,11 @@ function handleAttack(myCard, opponentCard) {
   const myLocalID = myCard.id;
   const opponentLocalId = opponentCard.id;
 
-  console.log("My Attack: " + myAttack);
-  console.log("Opponent defence: " + opponentDefence);
-
   const myHpSpan = myCard.querySelector("#card_health_txt");
   const opponentHpSpan = opponentCard.querySelector("#card_health_txt");
 
   const myHP = parseInt(myHpSpan.textContent);
-  console.log("My HP: " + myHP);
   const opponentHP = parseInt(opponentHpSpan.textContent);
-  console.log("Opponent HP: " + opponentHP);
 
   const myNewHP = myHP - opponentDefence;
   const opponentNewHP = opponentHP - myAttack;
@@ -395,10 +435,14 @@ function handleAttack(myCard, opponentCard) {
   }
 
   if (myNewHP <= 0) {
+    myCard.style.display = "none";
     yourBoardSection.removeChild(myCard);
   } else {
     myHpSpan.textContent = `${myNewHP}`;
   }
+
+  // myCard.setAttribute("data-card-moved", true);
+  myCard.draggable = false;
 
   socket.emit("card-card-attack", {
     room: roomName,
@@ -407,6 +451,26 @@ function handleAttack(myCard, opponentCard) {
     myCardId: opponentLocalId,
     myNewHP: opponentNewHP,
   });
+}
+
+function markExpensiveCards() {
+  const myCurrentMP = parseInt(yourMP.textContent);
+
+  Array.from(yourHand.children).forEach((card) => {
+    const cardMP = parseInt(
+      card.querySelector("#card_usage_price_txt").textContent
+    );
+    card.draggable = myCurrentMP >= cardMP;
+  });
+}
+
+function handleMP(card) {
+  const cardMP = parseInt(
+    card.querySelector("#card_usage_price_txt").textContent
+  );
+  const myCurrentMP = parseInt(yourMP.textContent);
+
+  yourMP.textContent = myCurrentMP - cardMP;
 }
 
 function createCardHTML(card) {

@@ -58,6 +58,14 @@ function initSocket(server) {
     socket.on("card-card-attack", (data) => {
       onCardCardAttack(io, socket, data);
     });
+
+    socket.on("card-user-attack", (data) => {
+      onCardUserAttack(io, socket, data);
+    });
+
+    socket.on("you-won", (data) => {
+      socket.broadcast.to(data.room).emit("you-won");
+    });
   });
 
   return io;
@@ -111,6 +119,12 @@ function onCardCardAttack(io, socket, data) {
     opHP: data.opHP,
     myCardId: data.myCardId,
     myNewHP: data.myNewHP,
+  });
+}
+
+function onCardUserAttack(io, socket, data) {
+  socket.broadcast.to(data.room).emit("opponent-attacks-me", {
+    points: data.points,
   });
 }
 
