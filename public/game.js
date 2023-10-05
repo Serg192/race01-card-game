@@ -83,12 +83,24 @@ yourBoardSection.addEventListener("dragend", (event) => {
   draggableElement.classList.remove("dragging");
 });
 
-opponentFace.addEventListener("dragover", (event) => {
+
+opponentFace.addEventListener('dragenter', (event) => {
   event.preventDefault();
+  opponentFace.classList.add('dragover-highlight');
+});
+
+opponentFace.addEventListener("dragover", (event) => {
+  opponentFace.classList.add("dragover-highlight");
+  event.preventDefault();
+});
+
+opponentFace.addEventListener('dragleave', (event) => {
+  opponentFace.classList.remove('dragover-highlight');
 });
 
 opponentFace.addEventListener("drop", (event) => {
   event.preventDefault();
+  opponentFace.classList.remove("dragover-highlight"); 
   const data = event.dataTransfer.getData("text/plain");
   const draggableElement = document.getElementById(data);
 
@@ -252,7 +264,7 @@ socket.on("room-found", (data) => {
   const gameDiv = document.getElementById("game-container");
 
   searchBox.style.display = "none";
-  gameDiv.style.display = "block";
+  gameDiv.style.display = "flex";
 
   document.getElementById("opponent_name").innerText =
     data.first === login ? data.second : data.first;
@@ -321,6 +333,11 @@ socket.on("opponent-attaks-my-card", (data) => {
   const myCardDiv = Array.from(yourBoardSection.children).filter(
     (card) => card.id == myCardId
   )[0];
+
+  myCardDiv.classList.add('card-attack');
+  setTimeout(() => {
+    myCardDiv.classList.remove('card-attack');
+  }, 1000);
 
   if (opHP <= 0) {
     opponentBoardSection.removeChild(opponentCardDiv);
